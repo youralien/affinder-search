@@ -9,7 +9,7 @@ from yelp.client import Client
 from yelp.oauth1_authenticator import Oauth1Authenticator
 from os import environ
 
-print(environ.get("YELP_KEY"))
+
 
 yelp_auth = auth = Oauth1Authenticator(
     consumer_key = environ.get("YELP_KEY"),
@@ -183,7 +183,7 @@ def populate_test_db():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, port=environ.get("PORT", 5000), host='0.0.0.0')
 
 
 @app.route("/")
