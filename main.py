@@ -6,13 +6,20 @@ import uuid
 import requests
 import datetime
 from configparser import ConfigParser
-
-def calculateDistance(x1,y1,x2,y2):
-     dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-     return dist
+from yelp.client import Client
+from yelp.oauth1_authenticator import Oauth1Authenticator
 
 config = ConfigParser()
 config.read("secrets/config.ini")
+
+yelp_auth = auth = Oauth1Authenticator(
+    consumer_key = config.get("yelp", "consumer_key"),
+    consumer_secret = config.get("yelp", "consumer_secret"),
+    token = config.get("yelp", "token"),
+    token_secret = config.get("yelp", "token_secret")
+)
+
+yelp_client = Client(yelp_auth)
 
 WEATHER_API_KEY = config.get("weather", "api_key")
 firebase_config = {
@@ -26,6 +33,11 @@ app = Flask (__name__)
 
 firebase = pyrebase.initialize_app(firebase_config)
 db = firebase.database()
+
+def calculateDistance(x1,y1,x2,y2):
+     dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+     return dist
+
 
 
 @app.route('/games/<string:lat>/<string:lon>', methods=['GET'])
@@ -74,7 +86,11 @@ def return_conditions(lat, lon):
 def get_current_conditions(lat, lon):
 	current_conditions = {"hours":0, "minutes":0, "affordances":[], "weather":"no info yet"}
 	current_conditions["weather"] = get_weather(lat, lon)
-	current_conditions["affordances"] = get_campus_locations(lat, lon)
+	(names, tags, affordances) = get_affordances_from_location(lat, lon)
+	(y_names, y_tags, y_affordances) = yelp_api(lat, lon)
+	current_conditions["location_names"] = names + y_names
+	current_conditions["location_tags"] = tags + y_tags
+	current_conditions["affordances"] = affordances + y_affordances
 	current_conditions["hours"] = datetime.datetime.now().hour
 	current_conditions["minutes"] = datetime.datetime.now().minute
 
@@ -83,27 +99,34 @@ def get_current_conditions(lat, lon):
 	db.child("current_conditions").set(data)
 	return current_conditions
 
-def get_campus_locations(clat, clon):
+def get_affordances_from_location(clat, clon):
 	locations = db.child("campus_locations").get()
 	location_names = []
+	location_tags = []
 	nearby_affordances = []
 
 	for loc in locations.each():
 		loc_info = dict(loc.val())
 		distance = math.sqrt((loc_info['lat']-clat)**2 + (loc_info['lon']-clon)**2)
 		
-		if (distance < 10):
-			location_tags = db.child("location_tags").child(loc_info["name"]).get()
-			nearby_affordances = nearby_affordances + get_affordances(location_tags.val())
+		if (distance < .005):
+			location_names.append(loc_info["name"])
+			location_tags = get_location_tags(loc_info["name"])
+			nearby_affordances = nearby_affordances + get_affordances(location_tags)
 
-	return nearby_affordances
+	return (location_names, location_tags, nearby_affordances)
+
+def get_location_tags(location_name):
+	return db.child("location_tags").child(location_name).get().val()
 
 def get_affordances(location_tags):
+	print("get affordacnes for ", location_tags, "\n \n \n \n")
 	all_affordances = []
 	for tag in location_tags:
 		affordances = db.child("tag_affordances").child(tag).get()
-		all_affordances = all_affordances + affordances.val()
-		
+		if affordances.val():
+			all_affordances = all_affordances + affordances.val()
+	print(all_affordances)	
 	return all_affordances
 	
 def get_weather(curr_lat, curr_lon):
@@ -115,12 +138,30 @@ def get_weather(curr_lat, curr_lon):
 
 	return weather
 
-def yelp_api():
-	category = coffeeshops
-	radius = 200;
-	url = "https://api.yelp.com/v2/search?category_filter=" + category + "&radius_filter=" + radius + "&ll=" + lat + "," + lon
 
-	37.788022,-122.399797
+#@app.route('/yelp', methods=['GET'])
+def yelp_api(lat, lon):
+	categories = ["coffee", "parks"]
+	tags = []
+	affordances = []
+	names = []
+
+	for c in categories:
+		params = {
+			"category_filter" : c,
+			"radius_filter" : 100,
+			"limit" : 1,
+		}
+		
+		resp = yelp_client.search_by_coordinates(lat, lon, **params)
+		print(resp)
+		for b in resp.businesses:
+			names.append(c)
+			tags = tags + get_location_tags(c)
+			affordances = affordances + get_affordances(tags)
+			print(b.name, b.categories)
+	
+	return (names, tags, affordances)
 
 
 def populate_test_db():

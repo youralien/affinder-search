@@ -1,0 +1,5 @@
+Coffee Lab
+42.0582565,-87.6841178
+
+Shakespeare Garden
+42.056854, -87.675991
