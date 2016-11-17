@@ -9,7 +9,27 @@ from yelp.client import Client
 from yelp.oauth1_authenticator import Oauth1Authenticator
 from os import environ
 
+app = Flask (__name__)
 
+class Data():
+
+	def __init__(self):
+		self.PARROT_STRING = "PARTY PARROT\n             #| \n          (\##| \n       (\#\|##| \n        (###### \n       ########) \n      |### (*)/.\ \n      |########\/ \n      |######### \n      |########## \n      //////\\\\\ \n  __ /            \ _ \n /  |              | \ \n|#  |              | #| \n|#  |              | #| \n|#  |              | #| \n|   |              |  | \n \  |              |  / \n   \ \ \ \ \ / / / / / \n    \ \\\\\\/////// / \n-------^^^----^^^-------- \n-------|||----|||-------- \n        \       / \n        |       | \n        |##   ##| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        \#|#|#|#/ \n          |#|#| \n          |#|#| \n          \#|#/ \n           \#/ \n"
+
+	def __str__(self):
+		return self.PARROT_STRING
+
+	def __repr__(self):
+		return self.__str__()
+
+
+
+@app.route('/test', methods=['GET'])
+def testing():
+	parrot = Data()
+	print(parrot)
+	return jsonify("PARTY PARROTS", parrot)
+	#return "\n \n PARTY PARROTS!! \n \n"
 
 yelp_auth = auth = Oauth1Authenticator(
     consumer_key = environ.get("YELP_KEY"),
@@ -28,7 +48,6 @@ firebase_config = {
   "storageBucket": environ.get("FIREBASE_NAME") + ".appspot.com"
 }
 
-app = Flask (__name__)
 
 firebase = pyrebase.initialize_app(firebase_config)
 db = firebase.database()
@@ -69,9 +88,7 @@ def get_games(lat, lon):
 	return "no games"
 
 
-@app.route('/test', methods=['GET'])
-def testing():
-	return "PARTY PARROTS!!"
+
 
 
 @app.route('/conditions/<string:lat>/<string:lon>', methods=['GET'])
@@ -182,9 +199,11 @@ def populate_test_db():
 
 
 if __name__ == '__main__':
-    app.run(debug=False, port=environ.get("PORT", 5000), host='0.0.0.0')
+    app.run(debug=True, port=environ.get("PORT", 5000), host='0.0.0.0')
 
 
 @app.route("/")
 def hello():
 	return "Hello World!"
+
+
