@@ -5,28 +5,27 @@ import json
 import uuid
 import requests
 import datetime
-from configparser import ConfigParser
 from yelp.client import Client
 from yelp.oauth1_authenticator import Oauth1Authenticator
+from os import environ
 
-config = ConfigParser()
-config.read("secrets/config.ini")
+print(environ.get("YELP_KEY"))
 
 yelp_auth = auth = Oauth1Authenticator(
-    consumer_key = config.get("yelp", "consumer_key"),
-    consumer_secret = config.get("yelp", "consumer_secret"),
-    token = config.get("yelp", "token"),
-    token_secret = config.get("yelp", "token_secret")
+    consumer_key = environ.get("YELP_KEY"),
+    consumer_secret = environ.get("YELP_CSECRET"),
+    token = environ.get("YELP_TOKEN"),
+    token_secret = environ.get("YELP_TSECRET")
 )
 
 yelp_client = Client(yelp_auth)
 
-WEATHER_API_KEY = config.get("weather", "api_key")
+WEATHER_API_KEY = environ.get("WEATHER_KEY")
 firebase_config = {
-  "apiKey": config.get("firebase", "db_api_key"),
-  "authDomain": config.get("firebase", "project_name")+".firebaseapp.com",
-  "databaseURL": "https://"+config.get("firebase", "project_name")+".firebaseio.com",
-  "storageBucket": config.get("firebase", "project_name") + ".appspot.com"
+  "apiKey": environ.get("FIREBASE_KEY"),
+  "authDomain": environ.get("FIREBASE_NAME") + ".firebaseapp.com",
+  "databaseURL": "https://"+environ.get("FIREBASE_NAME") +".firebaseio.com",
+  "storageBucket": environ.get("FIREBASE_NAME") + ".appspot.com"
 }
 
 app = Flask (__name__)

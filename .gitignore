@@ -1,6 +1,7 @@
 #API keys
 secrets
 config.ini
+.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
