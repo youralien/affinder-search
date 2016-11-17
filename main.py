@@ -71,8 +71,7 @@ def get_games(lat, lon):
 
 @app.route('/test', methods=['GET'])
 def testing():
-	print(token)
-	return jsonify(token)
+	return "PARTY PARROTS!!"
 
 
 @app.route('/conditions/<string:lat>/<string:lon>', methods=['GET'])
