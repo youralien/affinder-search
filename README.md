@@ -1,0 +1,2 @@
+# affordanceaware
+Affordance Aware API
