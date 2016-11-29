@@ -15,7 +15,8 @@ The request will return a JSON with the following fields:
 * weather -- descption of current weather, see range of options [here](https://openweathermap.org/weather-conditions)
 
 Supported location types include:
-* classrooms
+* Northwestern classrooms
+* Northwestern student housing
 * coffee shops
 * parks
 
