@@ -5,6 +5,7 @@ import json
 import uuid
 import requests
 import datetime
+from pytz import timezone   
 from yelp.client import Client
 from yelp.oauth1_authenticator import Oauth1Authenticator
 from os import environ
@@ -106,8 +107,8 @@ def get_current_conditions(lat, lon):
 	current_conditions["location_names"] = names + y_names
 	current_conditions["location_tags"] = tags + y_tags
 	current_conditions["affordances"] = affordances + y_affordances
-	current_conditions["hours"] = datetime.datetime.now().hour
-	current_conditions["minutes"] = datetime.datetime.now().minute
+	current_conditions["hours"] = datetime.datetime.now(timezone('US/Central')).hour
+	current_conditions["minutes"] = datetime.datetime.now(timezone('US/Central')).minute
 
 
 	key = uuid.uuid4().hex
@@ -152,8 +153,8 @@ def get_weather(curr_lat, curr_lon):
 	for w in response["weather"]:
 		weather = weather + w["description"] + " "
 	
-	sunset = datetime.datetime.fromtimestamp(response["sys"]["sunset"])
-	current_time = datetime.datetime.now() #datetime.datetime(2016, 11, 29, 16, 35, 20, 763499)
+	sunset = datetime.datetime.fromtimestamp(response["sys"]["sunset"], timezone('US/Central'))
+	current_time = datetime.datetime.now(timezone('US/Central')) #datetime.datetime(2016, 11, 29, 16, 35, 20, 763499)
 	light_outside = False
 	delta = datetime.timedelta(minutes = 10)
 
