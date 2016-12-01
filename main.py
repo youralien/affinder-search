@@ -274,7 +274,7 @@ def query_based_on_experience(exp):
 	print(ret_scores)
 	sorted_scores = sorted(ret_scores.items(), key=lambda x: x[1], reverse=True)
 	print(sorted_scores)
-	return (sorted_scores[0][0], jsonify(sorted_scores))
+	return jsonify(sorted_scores[0][0], sorted_scores)
 
 @app.route("/")
 def hello():
