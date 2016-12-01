@@ -4,4 +4,10 @@ Coffee Lab
 Shakespeare Garden
 42.056854/-87.675991
 
+North Mid Quads
+42.0518550570847/-87.6798154684847
+
+Thai Sookdee
+42.048457/-87.686113
+
 let user post to me locatoins/affordances

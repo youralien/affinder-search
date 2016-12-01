@@ -11,28 +11,6 @@ from os import environ
 
 app = Flask (__name__)
 
-class Data():
-
-	def __init__(self):
-		self.PARROT_STRING = "PARTY PARROT\n             #| \n          (\##| \n       (\#\|##| \n        (###### \n       ########) \n      |### (*)/.\ \n      |########\/ \n      |######### \n      |########## \n      //////\\\\\ \n  __ /            \ _ \n /  |              | \ \n|#  |              | #| \n|#  |              | #| \n|#  |              | #| \n|   |              |  | \n \  |              |  / \n   \ \ \ \ \ / / / / / \n    \ \\\\\\/////// / \n-------^^^----^^^-------- \n-------|||----|||-------- \n        \       / \n        |       | \n        |##   ##| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        \#|#|#|#/ \n          |#|#| \n          |#|#| \n          \#|#/ \n           \#/ \n"
-
-	def __str__(self):
-		return self.PARROT_STRING
-
-	def __repr__(self):
-		return self.__str__()
-
-@app.route('/testw', methods=['GET'])
-def testw():
-	return jsonify(get_weather(42.0582565, -87.6841178))
-
-@app.route('/test', methods=['GET'])
-def testing():
-	parrot = Data()
-	print(parrot)
-	return jsonify("PARTY PARROTS", parrot)
-	#return "\n \n PARTY PARROTS!! \n \n"
-
 yelp_auth = auth = Oauth1Authenticator(
     consumer_key = environ.get("YELP_KEY"),
     consumer_secret = environ.get("YELP_CSECRET"),
@@ -153,18 +131,15 @@ def get_weather(curr_lat, curr_lon):
 		weather = weather + w["description"] + " "
 	
 	sunset = datetime.datetime.fromtimestamp(response["sys"]["sunset"])
-	current_time = datetime.datetime.now() #datetime.datetime(2016, 11, 29, 16, 35, 20, 763499)
-	light_outside = False
-	delta = datetime.timedelta(minutes = 10)
+	current_time = datetime.datetime.now()  #datetime.datetime(2016, 11, 30, 16, 20, 20, 763499)#
+	light_outside = "NIGHTTIME"
+	delta = datetime.timedelta(minutes = 15)
 
 
-	if current_time.hour <= sunset.hour and current_time.minute <= sunset.minute:
-		if (sunset - current_time ) < delta:
-			light_outside = "SUNSET"
-		else:
-			light_outside = True
-	else:
-		if (current_time - sunset) < delta:
+	if current_time.hour <= sunset.hour:
+		light_outside = "DAYLIGHT"
+	
+	if abs((sunset - current_time).total_seconds()) < delta.total_seconds():
 			light_outside = "SUNSET"
 
 	return weather, light_outside
@@ -172,7 +147,7 @@ def get_weather(curr_lat, curr_lon):
 
 #@app.route('/yelp', methods=['GET'])
 def yelp_api(lat, lon):
-	categories = ["coffee", "parks", "gyms"]
+	categories = ["coffee", "parks", "gyms", "food"]
 	tags = []
 	affordances = []
 	names = []
@@ -236,12 +211,81 @@ def populate_campus_locations():
 
 
 
-if __name__ == '__main__':
-    app.run(debug=True, port=int(environ.get("PORT", 5000)), host='0.0.0.0')
 
+
+
+class Data():
+
+	def __init__(self):
+		self.PARROT_STRING = "PARTY PARROT\n             #| \n          (\##| \n       (\#\|##| \n        (###### \n       ########) \n      |### (*)/.\ \n      |########\/ \n      |######### \n      |########## \n      //////\\\\\ \n  __ /            \ _ \n /  |              | \ \n|#  |              | #| \n|#  |              | #| \n|#  |              | #| \n|   |              |  | \n \  |              |  / \n   \ \ \ \ \ / / / / / \n    \ \\\\\\/////// / \n-------^^^----^^^-------- \n-------|||----|||-------- \n        \       / \n        |       | \n        |##   ##| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        |#|#|#|#| \n        \#|#|#|#/ \n          |#|#| \n          |#|#| \n          \#|#/ \n           \#/ \n"
+
+	def __str__(self):
+		return self.PARROT_STRING
+
+	def __repr__(self):
+		return self.__str__()
+
+@app.route('/testw', methods=['GET'])
+def testw():
+	return jsonify(get_weather(42.0582565, -87.6841178))
+
+@app.route('/test', methods=['GET'])
+def testing():
+	parrot = Data()
+	print(parrot)
+	return jsonify("PARTY PARROTS", parrot)
+	#return "\n \n PARTY PARROTS!! \n \n"
+
+
+def get_test_location_affordances():
+	locations = db.child("test_locations").get()
+	location_affordances = {}
+	for loc in locations.each():
+		coords = loc.val().split("/")
+		conds = get_current_conditions(float(coords[0]), float(coords[1]))
+		cond_string = ""
+		for c in conds:
+			if type(conds[c]) is str:
+				cond_string = cond_string + " " + conds[c]
+			elif type(conds[c]) is int or type(conds[c]) is bool:
+				cond_string = cond_string + " " + str(conds[c])
+			else:
+				for i in conds[c]:
+					cond_string = cond_string + " " + i
+
+		location_affordances[loc.key()] = cond_string
+
+	print(location_affordances)
+	return location_affordances
+
+
+@app.route('/experience/<string:exp>', methods=['GET'])
+def query_based_on_experience(exp):
+	location_affordances = get_test_location_affordances() 
+	scores = dict.fromkeys(location_affordances, 0)
+	for word in exp.split(" "):
+		for loc, aff in location_affordances.items():
+			if word in aff:
+				scores[loc] = scores[loc] + 1
+	print(scores)
+	sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
+	if sorted_scores[0] == 0:
+		return "no good place for your experience, sorry! :("
+	return jsonify(sorted_scores[0])
 
 @app.route("/")
 def hello():
 	return "Hello World!"
+
+
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=int(environ.get("PORT", 5000)), host='0.0.0.0')
+
+
+
+
 
 
