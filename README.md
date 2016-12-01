@@ -19,6 +19,8 @@ Supported location types include:
 * Northwestern student housing
 * coffee shops
 * parks
+* gyms
+* resturants
 
 Example query while at a coffee shop in the evening:
 ```sh
