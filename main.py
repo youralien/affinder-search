@@ -268,10 +268,13 @@ def query_based_on_experience(exp):
 			if word in aff:
 				scores[loc] = scores[loc] + 1
 	print(scores)
-	sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
-	if scores[sorted_scores[0]] == 0:
+	ret_scores = dict((k, v) for k, v in scores.items() if v > 1)
+	if not ret_scores:
 		return "no good place for your experience, sorry! :("
-	return jsonify(sorted_scores[0])
+	print(ret_scores)
+	sorted_scores = sorted(ret_scores.items(), key=lambda x: x[1], reverse=True)
+	print(sorted_scores)
+	return "The best place would be: " + sorted_scores[0][0] +"\n\nplace rankings: \n" + str(sorted_scores)
 
 @app.route("/")
 def hello():
