@@ -269,7 +269,7 @@ def query_based_on_experience(exp):
 				scores[loc] = scores[loc] + 1
 	print(scores)
 	sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
-	if sorted_scores[0] == 0:
+	if scores[sorted_scores[0]] == 0:
 		return "no good place for your experience, sorry! :("
 	return jsonify(sorted_scores[0])
 
