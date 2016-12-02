@@ -42,7 +42,9 @@ var HttpClient = function() {
             if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
                 aCallback(anHttpRequest.responseText);
         }
-
+        anHttpRequest.header('Access-Control-Allow-Origin', '*');
+        anHttpRequest.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    	anHttpRequest.header('Access-Control-Allow-Headers', 'accept, content-type, x-parse-application-id, x-parse-rest-api-key, x-parse-session-token');
         anHttpRequest.open( "GET", aUrl, true );            
         anHttpRequest.send( null );
     }
