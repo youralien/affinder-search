@@ -155,7 +155,7 @@ def yelp_api(lat, lon):
 	for c in categories:
 		params = {
 			"category_filter" : c,
-			"radius_filter" : 75,
+			"radius_filter" : 200,
 			"limit" : 1,
 			"open_now" : True,
 		}
