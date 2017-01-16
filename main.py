@@ -147,7 +147,7 @@ def get_weather(curr_lat, curr_lon):
 
 #@app.route('/yelp', methods=['GET'])
 def yelp_api(lat, lon):
-	categories = ["coffee", "parks", "gyms", "food"]
+	categories = ["coffee", "parks", "gyms", "food", "beer_and_wine", "pubs", "beaches"]
 	tags = []
 	affordances = []
 	names = []
@@ -155,12 +155,15 @@ def yelp_api(lat, lon):
 	for c in categories:
 		params = {
 			"category_filter" : c,
-			"radius_filter" : 100,
+			"radius_filter" : 75,
 			"limit" : 1,
 			"open_now" : True,
 		}
 		resp = yelp_client.search_by_coordinates(lat, lon, **params)
 		for b in resp.businesses:
+			print(b.name)
+			print(b.location.coordinate.latitude, b.location.coordinate.longitude)
+
 			names.append(c)
 			loc_tags = get_location_tags(c)
 			if loc_tags:
@@ -169,6 +172,10 @@ def yelp_api(lat, lon):
 			aff = get_affordances(tags)
 			if aff:
 				affordances = affordances + aff
+
+			if(b.name == "Peet's Coffee"):
+				affordances = affordances + ["coffee"]
+				
 				
 	return (names, tags, affordances)
 
@@ -210,6 +217,61 @@ def populate_campus_locations():
 		db.update(data1)
 
 
+@app.route('/specify/<string:lat>/<string:lon>', methods=['GET'])
+def specify(lat, lon):
+	lat = float(lat)
+	lon = float(lon)
+	params = {
+			"radius_filter" : 500,
+			"limit" : 1,
+	}
+	resp = yelp_client.search_by_coordinates(lat, lon, **params)
+	for b in resp.businesses:
+		print(b.name, b.categories)		
+		return jsonify(b.categories)
+
+
+@app.route('/gen/<string:lat>/<string:lon>/<string:cat>', methods=['GET'])
+def gen(lat, lon, cat):
+	lat = float(lat)
+	lon = float(lon)
+
+	params = {
+			"category_filter" : cat,
+			"radius_filter" : 2000,
+	}
+
+	results=""
+
+	resp = yelp_client.search_by_coordinates(lat, lon, **params)
+	for b in resp.businesses:
+		print(b.name, b.categories, b.location.coordinate.latitude, b.location.coordinate.longitude)
+		results = results + b.name + ", " + str(b.location.coordinate.latitude) + ", " + str(b.location.coordinate.longitude) + "/"
+
+	return jsonify(results)
+
+@app.route('/expand/<string:lat>/<string:lon>/<string:aff>', methods=['GET'])
+def expand(lat, lon, aff):
+	lat = float(lat)
+	lon = float(lon)
+
+	affordances_categories = {"sit": ["coffee", "restaurants", "internetcafe", "cafes", "cafeteria"], 
+		"snowman": ["parks","beaches","playgrounds", "baseballfields", "football", "publicart"]}
+
+	categories = affordances_categories[aff]
+	results=""
+	for c in categories:
+		params = {
+				"category_filter" : c,
+				"radius_filter" : 3000,
+		}
+
+		resp = yelp_client.search_by_coordinates(lat, lon, **params)
+		for b in resp.businesses:
+			print(b.name, b.categories, b.location.coordinate.latitude, b.location.coordinate.longitude)
+			results = results + b.name + ", " + c +", " + str(b.location.coordinate.latitude) + ", " + str(b.location.coordinate.longitude) + "/"
+
+	return jsonify(results)
 
 
 
