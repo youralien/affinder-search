@@ -10,4 +10,10 @@ North Mid Quads
 Thai Sookdee
 42.048457/-87.686113
 
+Beach
+42.049015/-87.674451
+
+Nevins
+42.044389/-87.681976
+
 let user post to me locatoins/affordances
