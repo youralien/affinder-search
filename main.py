@@ -40,6 +40,9 @@ firebase_config = {
 
 firebase = pyrebase.initialize_app(firebase_config)
 db = firebase.database()
+@app.route('/conditions/<string:lat>/<string:lon>', methods=['GET'])
+    def get_conditions(lat, lon):
+        return "please use /location_tags now"
 
 @app.route('/location_tags/<string:lat>/<string:lon>', methods=['GET'])
 def get_location_tags(lat, lon):
