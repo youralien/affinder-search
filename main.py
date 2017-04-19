@@ -56,7 +56,7 @@ def get_current_conditions(lat, lon):
     current_conditions += get_weather(lat, lon)
     current_conditions += yelp_api(lat, lon)
     current_conditions += google_api(lat, lon)
-    return list(set(current_conditions))
+    return map(lambda x: x.lower(), list(set(current_conditions)))
 
 def get_weather(curr_lat, curr_lon):
     url = "http://api.openweathermap.org/data/2.5/weather?lat=" + str(curr_lat) + "&lon=" + str(curr_lon) + "&appid=" + WEATHER_API_KEY
@@ -99,24 +99,29 @@ def google_api(lat, lon):
 
 #@app.route('/yelp', methods=['GET'])
 def yelp_api(lat, lon):
+    print "inside yelp!"
     tags = []
     affordances = []
     names = []
 
     params = {
     	"radius_filter" : 20,
-    	"limit" : 1,
+    	"limit" : 3,
         "sort" : 1, #sort by distance
-    	"open_now" : True,
+    	#"open_now" : True,
     }
     resp = yelp_client.search_by_coordinates(lat, lon, **params)
+    print resp
+    info = []
     if not resp.businesses:
         return []
-    b = resp.businesses[0]
-    name = b.name
-    categories = [c[1] for c in b.categories]
-    info = categories + [name]
-    print info
+    for b in resp.businesses:
+        name = b.name
+        print name
+        categories = [c[1] for c in b.categories]
+        print categories
+        info = info + categories + [name]
+        print info
     return info
 
 
