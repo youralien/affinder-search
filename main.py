@@ -55,7 +55,7 @@ def get_current_conditions(lat, lon):
     current_conditions = []
     current_conditions += get_weather(lat, lon)
     current_conditions += yelp_api(lat, lon)
-    current_conditions += google_api(lat, lon)
+    #current_conditions += google_api(lat, lon)
     return map(lambda x: x.lower(), list(set(current_conditions)))
 
 def get_weather(curr_lat, curr_lon):
