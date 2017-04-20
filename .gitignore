@@ -1,5 +1,5 @@
 #API keys
-secrets
+secrets.py
 config.ini
 .env
 

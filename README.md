@@ -5,6 +5,13 @@ Make a GET request to the following URL:
 https://affordanceaware.herokuapp.com/conditions/<latitude>/<longitude>
 ```
 
+pip freeze > requirements.txt
+
+pip install -r requirements.txt
+
+create .evn file
+
+
 The request will return a JSON with the following fields:
 * affordances -- array of affordance
 * daylight -- either true, false or SUNSET
@@ -29,21 +36,21 @@ $ curl -i http://0.0.0.0:5000/conditions/42.0582565/-87.6841178
 ```
 {
   "affordances": [
-    "eat", 
-    "people_watch", 
+    "eat",
+    "people_watch",
     "sit"
-  ], 
-  "daylight": false, 
-  "hours": 17, 
+  ],
+  "daylight": false,
+  "hours": 17,
   "location_names": [
     "coffee"
-  ], 
+  ],
   "location_tags": [
-    "food", 
-    "people", 
+    "food",
+    "people",
     "table"
-  ], 
-  "minutes": 6, 
+  ],
+  "minutes": 6,
   "weather": "clear sky "
 }
 
