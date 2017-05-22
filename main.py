@@ -81,6 +81,7 @@ def get_current_conditions(lat, lon):
     print current_conditions
     return map(lambda x: x.lower(), list(set(current_conditions)))
 
+@app.route('/local_testing/<string:lat>/<string:lon>', methods=['GET'])
 def local_testing_spots(lat, lon):
     testing_spots = [{"hackerspace": (42.056929, -87.676694)}, 
                      {"end_of_f_wing": (42.057472, -87.67662)},
@@ -89,9 +90,11 @@ def local_testing_spots(lat, lon):
                      {"l_wing":(42.057809, -87.67611)}]
 
     close_locations = []
-
     for loc in testing_spots:
-        if(vincenty(loc.values()[0], (lat, lon)) < 20):
+        dist = vincenty(loc.values()[0], (lat, lon)).meters
+        if( dist < 35):
+            print loc.keys()[0]
+            print dist
             close_locations.append(loc.keys()[0])
     return close_locations
 
