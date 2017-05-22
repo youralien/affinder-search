@@ -91,7 +91,7 @@ def local_testing_spots(lat, lon):
     close_locations = []
 
     for loc in testing_spots:
-        if(vincenty(loc.values()[0], (lat, lon)) < 40):
+        if(vincenty(loc.values()[0], (lat, lon)) < 20):
             close_locations.append(loc.keys()[0])
     return close_locations
 
