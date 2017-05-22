@@ -1,3 +1,5 @@
+BeautifulSoup==3.2.1
+beautifulsoup4==4.6.0
 click==6.6
 configparser==3.5.0
 cycler==0.10.0
@@ -10,6 +12,7 @@ futures==3.0.5
 gax-google-logging-v2==0.8.3
 gax-google-pubsub-v1==0.8.3
 gcloud==0.17.0
+geopy==1.11.0
 google-gax==0.14.1
 googleapis-common-protos==1.5.0
 grpc-google-logging-v2==0.8.1
@@ -48,5 +51,4 @@ timezonefinder==2.0.1
 update-checker==0.11
 virtualenv==15.1.0
 Werkzeug==0.11.11
-wheel==0.26.0
 yelp==1.0.2

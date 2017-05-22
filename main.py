@@ -11,7 +11,7 @@ from yelp.oauth1_authenticator import Oauth1Authenticator
 from os import environ
 from googleplaces import GooglePlaces, types, lang
 from timezonefinder import TimezoneFinder
-
+from geopy.distance import vincenty
 
 
 YOUR_API_KEY = 'AIzaSyDBghn4IdWKYc8YC2b2N_xYf5eaouqWvtg'
@@ -43,7 +43,7 @@ db = firebase.database()
 @app.route('/conditions/<string:lat>/<string:lon>', methods=['GET'])
 def get_conditions(lat, lon):
     return []
-    
+
 @app.route('/location_tags/<string:lat>/<string:lon>', methods=['GET'])
 def get_location_tags(lat, lon):
     lat = float(lat)
@@ -51,12 +51,52 @@ def get_location_tags(lat, lon):
     conditions = get_current_conditions(lat, lon)
     return jsonify(conditions)
 
+@app.route('/search/<string:cat>', methods=['GET'])
+def get_search(cat):
+    params = {
+        "term": cat,
+        "radius_filter" : 500,
+        #"limit": 20,
+        "sort" : 1, #sort by distance
+        #"open_now" : True,
+    }
+    resp = yelp_client.search_by_coordinates(42.046876, -87.679532, **params)
+    info = []
+    if not resp.businesses:
+        return []
+    for b in resp.businesses:
+        name = b.name
+        categories = [c[1] for c in b.categories]
+        info = info  + [name, categories]
+    
+    return jsonify(info)
+
+
 def get_current_conditions(lat, lon):
     current_conditions = []
     current_conditions += get_weather(lat, lon)
     current_conditions += yelp_api(lat, lon)
+    current_conditions += local_testing_spots(lat, lon)
     #current_conditions += google_api(lat, lon)
+    print current_conditions
     return map(lambda x: x.lower(), list(set(current_conditions)))
+
+def local_testing_spots(lat, lon):
+    testing_spots = [{"hackerspace": (42.056929, -87.676694)}, 
+                     {"end_of_f_wing": (42.057472, -87.67662)},
+                     {"atrium": (42.057323, -87.676164)},
+                     {"k_wing": (42.05745, -87.675085)},
+                     {"l_wing":(42.057809, -87.67611)}]
+
+    close_locations = []
+
+    for loc in testing_spots:
+        if(vincenty(loc.values()[0], (lat, lon)) < 40):
+            close_locations.append(loc.keys()[0])
+    return close_locations
+
+
+
 
 def get_weather(curr_lat, curr_lon):
     url = "http://api.openweathermap.org/data/2.5/weather?lat=" + str(curr_lat) + "&lon=" + str(curr_lon) + "&appid=" + WEATHER_API_KEY
@@ -73,17 +113,17 @@ def get_weather(curr_lat, curr_lon):
     tz = timezone(tf.timezone_at(lng=curr_lon, lat=curr_lat))
     current_local = current_in_utc.replace(tzinfo=tz)
 
-    if(abs(sunset_in_utc - current_in_utc) <= datetime.timedelta(minutes = 15)):
-        return [weather, "SUNSET"]
+    if(abs(sunset_in_utc - current_in_utc) <= datetime.timedelta(minutes = 25)):
+        return [weather, "SUNSET"]#, current_in_utc, ["sunset", sunset_in_utc]]
 
-    if(abs(sunrise_in_utc - current_in_utc) <= datetime.timedelta(minutes = 15)):
-        return [weather, "SUNRISE"]
+    if(abs(sunrise_in_utc - current_in_utc) <= datetime.timedelta(minutes = 25)):
+        return [weather, "SUNRISE"]#, current_in_utc, ["sunset", sunset_in_utc]]
 
     if sunset_in_utc >  current_in_utc and sunrise_in_utc < current_in_utc:
-        return [weather, "DAYTIME"]
+        return [weather, "DAYTIME"]#, current_in_utc, ["sunset", sunset_in_utc]]
 
     if sunset_in_utc <  current_in_utc or sunrise_in_utc > current_in_utc:
-        return [weather, "NIGHTTIME"]
+        return [weather, "NIGHTTIME"]#, current_in_utc, ["sunset", sunset_in_utc]]
 
     return []
 
@@ -108,7 +148,7 @@ def yelp_api(lat, lon):
     	"radius_filter" : 20,
     	"limit" : 3,
         "sort" : 1, #sort by distance
-    	#"open_now" : True,
+    	"open_now" : True,
     }
     resp = yelp_client.search_by_coordinates(lat, lon, **params)
     print resp
@@ -123,6 +163,31 @@ def yelp_api(lat, lon):
         info = info + categories + [name]
         print info
     return info
+
+@app.route('/test_locations/<string:lat>/<string:lon>', methods=['GET'])
+def test_yelp(lat, lon):
+    print "inside yelp!"
+    tags = []
+    affordances = []
+    names = []
+
+    params = {
+        "limit" : 10,
+        "sort" : 1, #sort by distance
+    }
+    resp = yelp_client.search_by_coordinates(float(lat), float(lon), **params)
+    print resp
+    info = []
+    if not resp.businesses:
+        return []
+    for b in resp.businesses:
+        name = b.name
+        print name
+        categories = [c[1] for c in b.categories]
+        print categories
+        info = info + [[name]+categories]
+        print info
+    return jsonify(info)
 
 
 @app.route("/")
