@@ -78,8 +78,23 @@ def get_current_conditions(lat, lon):
     current_conditions += yelp_api(lat, lon)
     current_conditions += local_testing_spots(lat, lon)
     #current_conditions += google_api(lat, lon)
+    current_conditions = map(lambda x: x.lower(), list(set(current_conditions)))
+    
+    get_objects(current_conditions)
     print current_conditions
-    return map(lambda x: x.lower(), list(set(current_conditions)))
+    return current_conditions
+
+
+def get_objects(conditions):
+    objects = {"beaches": ["waves"], "northwestern university library": ["castle"],
+               "coffee": ["chair"], "parks": ["trees", "grass"], "hackerspace": ["computer"], 
+               "trainstations": ["train"], "northwestern university sailing center": ["sailboat"],
+            }
+
+    for key, value in objects.iteritems():
+        if key in conditions: 
+            conditions+= value
+    return conditions
 
 @app.route('/local_testing/<string:lat>/<string:lon>', methods=['GET'])
 def local_testing_spots(lat, lon):
