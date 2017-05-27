@@ -102,7 +102,12 @@ def local_testing_spots(lat, lon):
                      {"end_of_f_wing": (42.057472, -87.67662)},
                      {"atrium": (42.057323, -87.676164)},
                      {"k_wing": (42.05745, -87.675085)},
-                     {"l_wing":(42.057809, -87.67611)}]
+                     {"l_wing":(42.057809, -87.67611)},
+                     {"grocery": (42.047691, -87.679189)},
+                     {"grocery": (42.047691, -87.679189)},
+                     {"grocery": (42.047874, -87.679489)}
+
+                     ]
 
     close_locations = []
     for loc in testing_spots:
@@ -163,7 +168,7 @@ def yelp_api(lat, lon):
     names = []
 
     params = {
-    	"radius_filter" : 20,
+    	"radius_filter" : 40,
     	"limit" : 3,
         "sort" : 1, #sort by distance
     	"open_now" : True,
