@@ -66,6 +66,7 @@ def get_search(cat):
         return []
     for b in resp.businesses:
         name = b.name
+        name = name.replace(" ", "_")
         categories = [c[1] for c in b.categories]
         info = info  + [name, categories]
     
@@ -86,9 +87,10 @@ def get_current_conditions(lat, lon):
 
 
 def get_objects(conditions):
-    objects = {"beaches": ["waves"], "northwestern university library": ["castle"],
-               "coffee": ["chair"], "parks": ["trees", "grass"], "hackerspace": ["computer"], 
-               "trainstations": ["train"], "northwestern university sailing center": ["sailboat"],
+    objects = {"beaches": ["waves", "build_a_sandcastle"], "northwestern_university_library": ["castle"],
+               "coffee": ["chair", "sit in a chair"], "parks": ["trees", "grass", "frolick", "hug a tree", "pick a leaf"], 
+               "hackerspace": ["computer", "relax in a chair", "surf the interweb"], 
+               "trainstations": ["train", "ride a train"], "northwestern_university_sailing_center": ["sailboat"],
             }
 
     for key, value in objects.iteritems():
