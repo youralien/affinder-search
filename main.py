@@ -88,9 +88,9 @@ def get_current_conditions(lat, lon):
 
 def get_objects(conditions):
     objects = {"beaches": ["waves", "build_a_sandcastle"], "northwestern_university_library": ["castle"],
-               "coffee": ["chair", "sit in a chair"], "parks": ["trees", "grass", "frolick", "hug a tree", "pick a leaf"], 
-               "hackerspace": ["computer", "relax in a chair", "surf the interweb"], 
-               "trainstations": ["train", "ride a train"], "northwestern_university_sailing_center": ["sailboat"],
+               "coffee": ["chair", "sit_in_a_chair"], "parks": ["trees", "grass", "frolick", "hug_a_tree", "pick_a_leaf"], 
+               "hackerspace": ["computer", "relax_in_a_chair", "surf_the_interweb"], 
+               "trainstations": ["train", "ride_a_train"], "northwestern_university_sailing_center": ["sailboat"],
             }
 
     for key, value in objects.iteritems():
