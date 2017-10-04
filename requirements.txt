@@ -3,19 +3,15 @@ pytz==2013.7
 Cython==0.27.1
 pyOpenSSL==17.3.0
 backports.functools_lru_cache==1.4
-com==1.0.0
 ed25519ll==0.6
 Flask==0.12.2
 geopy==1.11.0
 protobuf==3.4.0
 ipaddr==2.2.0
-java==0.0.1
 keyring==10.4.0
 lxml==4.0.0
 ndg_httpsclient==0.4.3
-nt==0.0.0
 numpy==1.13.3
-org==1.0.0
 pyasn1==0.3.7
 pyrebase==3.0.27
 redis==2.10.6
@@ -23,3 +19,4 @@ timezonefinder==2.1.0
 wincertstore==0.2
 pyxdg==0.25
 yelp==1.0.2
+python-google-places==1.4.0
