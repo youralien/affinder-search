@@ -82,7 +82,7 @@ def get_current_conditions(lat, lon):
     current_conditions = map(lambda x: x.lower(), list(set(current_conditions)))
     
     get_objects(current_conditions)
-    print current_conditions
+    print(current_conditions)
     return current_conditions
 
 
@@ -115,8 +115,8 @@ def local_testing_spots(lat, lon):
     for loc in testing_spots:
         dist = vincenty(loc.values()[0], (lat, lon)).meters
         if( dist < 35):
-            print loc.keys()[0]
-            print dist
+            print(loc.keys()[0])
+            print(dist)
             close_locations.append(loc.keys()[0])
     return close_locations
 
@@ -164,7 +164,7 @@ def google_api(lat, lon):
 
 #@app.route('/yelp', methods=['GET'])
 def yelp_api(lat, lon):
-    print "inside yelp!"
+    print("inside yelp!")
     tags = []
     affordances = []
     names = []
@@ -176,22 +176,22 @@ def yelp_api(lat, lon):
     	"open_now" : True,
     }
     resp = yelp_client.search_by_coordinates(lat, lon, **params)
-    print resp
+    print(resp)
     info = []
     if not resp.businesses:
         return []
     for b in resp.businesses:
         name = b.name
-        print name
+        print(name)
         categories = [c[1] for c in b.categories]
-        print categories
+        print(categories)
         info = info + categories + [name]
-        print info
+        print(info)
     return info
 
 @app.route('/test_locations/<string:lat>/<string:lon>', methods=['GET'])
 def test_yelp(lat, lon):
-    print "inside yelp!"
+    print("inside yelp!")
     tags = []
     affordances = []
     names = []
@@ -201,17 +201,17 @@ def test_yelp(lat, lon):
         "sort" : 1, #sort by distance
     }
     resp = yelp_client.search_by_coordinates(float(lat), float(lon), **params)
-    print resp
+    print(resp)
     info = []
     if not resp.businesses:
         return []
     for b in resp.businesses:
         name = b.name
-        print name
+        print(name)
         categories = [c[1] for c in b.categories]
-        print categories
+        print(categories)
         info = info + [[name]+categories]
-        print info
+        print(info)
     return jsonify(info)
 
 
