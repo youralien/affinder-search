@@ -2,8 +2,12 @@ import io
 
 import mysql.connector
 
-# from sklearn.feature_extraction.text
+from sklearn.feature_extraction.text import TfidfVectorizer
 
+def cat2doc(cat):
+    """ Sushi Bars -> Sushi Bars.txt 
+    From Category to Document filepath """
+    return "reviewtext/%s.txt" % cat
 
 def write_document(cursor, cat):
     """ Given a yelp category, build out a text document
@@ -15,7 +19,7 @@ def write_document(cursor, cat):
 
     n_encoding_errors = 0
     n_review = 0
-    with io.open("reviewtext/%s.txt" % cat, 'w', encoding='utf8') as f:
+    with io.open(cat2doc(cat), 'w', encoding='utf8') as f:
         for text, in cursor:
             try:
                 f.write(text)
@@ -42,6 +46,20 @@ def sql2txt(categories):
     cursor.close()
     cnx.close()
 
+def vectorize(categories):
+    if isinstance(categories, str):
+        categories = (categories, )
+
+    categories = [cat2doc(cat) for cat in categories]
+
+    # should I use the vocabulary from something like fasttext?
+    # stop words: sklearn.feature_extraction.text.ENGLISH_STOP_WORDS
+    vect = TfidfVectorizer(input='filename', vocabulary=None, stop_words=None)
+
+    X = vect.fit_transform(categories)
+    return (X, vect)
+
+
+
 if __name__ == '__main__':
-    sql2txt('Sushi Bars')
-    sql2txt(('Korean', 'Japanese'))
+    X, vect = vectorize(('Sushi Bars', 'Korean', 'Japanese'))
