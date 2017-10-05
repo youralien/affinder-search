@@ -25,17 +25,23 @@ def write_document(cursor, cat):
             n_review += 1
     return n_encoding_errors, n_review
 
-def main():
+def sql2txt(categories):
     cnx = mysql.connector.connect(user='root', password='gottagofast',
                                   host='127.0.0.1',
                                   database='yelp_db')
 
     cursor = cnx.cursor()
-    cat = "Sushi Bars"
-    n_errors, n_total = write_document(cursor, cat)
-    print("%s: %d errors, %d total" % (cat, n_errors, n_total))
+
+    if isinstance(categories, str):
+        categories = (categories, )
+
+    for cat in categories:
+        n_errors, n_total = write_document(cursor, cat)
+        print("%s: %d errors, %d total" % (cat, n_errors, n_total))
+
     cursor.close()
     cnx.close()
 
 if __name__ == '__main__':
-    main()
+    sql2txt('Sushi Bars')
+    sql2txt(('Korean', 'Japanese'))
