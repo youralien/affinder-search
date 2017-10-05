@@ -1,4 +1,7 @@
+import io
+
 import mysql.connector
+
 # from sklearn.feature_extraction.text 
 
 
@@ -12,11 +15,11 @@ def write_document(cursor, cat):
 
 	n_encoding_errors = 0
 	n_review = 0
-	with open("reviewtext/%s.txt" % cat, 'w') as f:
+	with io.open("reviewtext/%s.txt" % cat, 'w', encoding='utf8') as f:
 		for text, in cursor:
 			try:
 				f.write(text)
-				f.write('\n')
+				f.write(unicode("\n"))
 			except UnicodeEncodeError, e:
 				n_encoding_errors += 1
 			n_review += 1
@@ -28,7 +31,7 @@ def main():
 	                              database='yelp_db')
 
 	cursor = cnx.cursor()
-	cat = "Korean"
+	cat = "Sushi Bars"
 	n_errors, n_total = write_document(cursor, cat)
 	print("%s: %d errors, %d total" % (cat, n_errors, n_total))
 	cursor.close()
