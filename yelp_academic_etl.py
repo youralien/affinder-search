@@ -9,6 +9,24 @@ def cat2doc(cat):
     From Category to Document filepath """
     return "reviewtext/%s.txt" % cat
 
+def all_categories():
+    cnx = mysql.connector.connect(user='root', password='gottagofast',
+                                  host='127.0.0.1',
+                                  database='yelp_db')
+
+    cursor = cnx.cursor()
+
+    query = ("SELECT DISTINCT category.category FROM category")
+    cursor.execute(query)
+
+
+    categories = [category for category, in cursor]
+
+    cursor.close()
+    cnx.close()
+
+    return categories
+
 def write_document(cursor, cat):
     """ Given a yelp category, build out a text document
     which has all the reviews for that category """
@@ -46,6 +64,11 @@ def sql2txt(categories):
     cursor.close()
     cnx.close()
 
+def create_all_documents():
+    cats = all_categories()
+    print("Creating %d documents" % len(cats))
+    sql2txt(cats)
+
 def vectorize(categories):
     if isinstance(categories, str):
         categories = (categories, )
@@ -57,9 +80,12 @@ def vectorize(categories):
     vect = TfidfVectorizer(input='filename', vocabulary=None, stop_words=None)
 
     X = vect.fit_transform(categories)
-    return (X, vect)
+    vocabulary = vect.get_feature_names()
 
+    return (X, categories, vocabulary)
 
 
 if __name__ == '__main__':
-    X, vect = vectorize(('Sushi Bars', 'Korean', 'Japanese'))
+    create_all_documents()
+    # X, categories, vocabulary = vectorize(('Sushi Bars', 'Korean', 'Japanese'))
+
