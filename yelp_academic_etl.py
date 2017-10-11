@@ -1,12 +1,18 @@
 import io
+import os
 
+import numpy as np
+import pandas as pd
 import mysql.connector
-
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def cat2doc(cat):
     """ Sushi Bars -> Sushi Bars.txt 
     From Category to Document filepath """
+
+    # Some categories have '/' in their name, which can throw off file paths.
+    cat = cat.replace('/', '-')
+
     return "reviewtext/%s.txt" % cat
 
 def all_categories():
@@ -47,7 +53,7 @@ def write_document(cursor, cat):
             n_review += 1
     return n_encoding_errors, n_review
 
-def sql2txt(categories):
+def sql2txt(categories, recompute=False):
     cnx = mysql.connector.connect(user='root', password='gottagofast',
                                   host='127.0.0.1',
                                   database='yelp_db')
@@ -58,8 +64,9 @@ def sql2txt(categories):
         categories = (categories, )
 
     for cat in categories:
-        n_errors, n_total = write_document(cursor, cat)
-        print("%s: %d errors, %d total" % (cat, n_errors, n_total))
+        if recompute or not os.path.exists(cat2doc(cat)):
+            n_errors, n_total = write_document(cursor, cat)
+            print("%s: %d errors, %d total" % (cat, n_errors, n_total))
 
     cursor.close()
     cnx.close()
@@ -84,8 +91,25 @@ def vectorize(categories):
 
     return (X, categories, vocabulary)
 
+def top_tfidf_feats(row, features, top_n=25):
+    """ Get top n tfidf values in row and return them with their corresponding
+    feature names.
+    Source: https://buhrmann.github.io/tfidf-analysis.html
+    """
+    topn_ids = np.argsort(row)[::-1][:top_n]
+    top_feats = [(features[i], row[i]) for i in topn_ids]
+    df = pd.DataFrame(top_feats)
+    df.columns = ['feature', 'tfidf']
+    return df
+
+def top_feats_in_doc(X, features, row_id, top_n=25):
+    """ Top tfidf features in specific document (matrix row)
+    Source: https://buhrmann.github.io/tfidf-analysis.html
+    """
+    row = np.squeeze(X[row_id].toarray())
+    return top_tfidf_feats(row, features, top_n)
 
 if __name__ == '__main__':
-    create_all_documents()
-    # X, categories, vocabulary = vectorize(('Sushi Bars', 'Korean', 'Japanese'))
+    X, categories, vocabulary = vectorize(('Sushi Bars', 'Bikes', 'Dance Clubs'))
+    df = top_feats_in_doc(X, vocabulary, 0)
 
