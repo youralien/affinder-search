@@ -100,12 +100,15 @@ def document_text_iterator(categories):
         with io.open(filepath, 'r', encoding='utf8') as f:
             yield f.read()
 
+def document_iterator(categories):
+    for filepath in cats2docs(categories):
+        yield filepath
 
 def vectorize_sklearn(categories):
     # should I use the vocabulary from something like fasttext?
     vect = TfidfVectorizer(input='filename',
                            vocabulary=None, stop_words=ENGLISH_STOP_WORDS)
-    X = vect.fit_transform(document_text_iterator(categories))
+    X = vect.fit_transform(document_iterator(categories))
     vocabulary = vect.get_feature_names()
     return (X, categories, vocabulary)
 
@@ -145,11 +148,15 @@ def top_feats_in_doc(X, features, row_id, top_n=25):
     return top_tfidf_feats(row, features, top_n)
 
 if __name__ == '__main__':
-    categories = ('Sushi Bars',
-                  'Bikes',
-                  'Dance Clubs')
-    X, categories, vocabulary = vectorize_textacy(categories)
+    # categories = ('Sushi Bars',
+    #               'Bikes',
+    #               'Dance Clubs')
 
-    for i, cat in enumerate(categories):
-        print cat
-        print top_feats_in_doc(X, vocabulary, i)
+    categories = all_categories()
+    X, categories, vocabulary = vectorize_sklearn(categories)
+
+    np.savez_compressed('tfidf/stopword-sklearn',
+        X=X, categories=categories, vocabulary=vocabulary)
+    # for i, cat in enumerate(categories):
+    #     print cat
+    #     print top_feats_in_doc(X, vocabulary, i)
