@@ -2,6 +2,112 @@
 
 ## TF-IDF
 
+### With defaults for word frequencies provided by spaCy + textacy
+
+#### Method
+```python
+    terms_list = (doc.to_terms_list(ngrams=1, as_strings=True)
+                  for doc in corpus)
+    vect = textacy.Vectorizer(
+        weighting='tfidf', normalize=True, smooth_idf=True,
+        min_df=2, max_df=0.95)
+```
+
+#### Data
+
+Sushi Bars
+```
+       feature     tfidf
+0      sashimi  0.393490
+1        spicy  0.388859
+2         ayce  0.308021
+3       shrimp  0.286034
+4      tempura  0.263642
+5     waitress  0.249857
+6         miso  0.199458
+7    appetizer  0.194952
+8        fried  0.174852
+9       nigiri  0.171359
+10      buffet  0.132702
+11    teriyaki  0.109078
+12     seafood  0.104633
+13     hibachi  0.098755
+14     avocado  0.097663
+15      korean  0.096322
+16  happy hour  0.095917
+17     scallop  0.094326
+18     edamame  0.082428
+19      wasabi  0.080650
+20  yellowtail  0.079980
+21      entree  0.075848
+22         soy  0.074491
+23    cucumber  0.073072
+24       raman  0.072510
+```
+
+Bikes
+```
+        feature     tfidf
+0           rei  0.832503
+1       cycling  0.436514
+2      warranty  0.174837
+3           bmx  0.122733
+4     triathlon  0.100734
+5        fender  0.078735
+6    suspension  0.061367
+7       electra  0.059051
+8         fixie  0.057893
+9       bateman  0.054420
+10     curbside  0.053262
+11     dividend  0.053262
+12         fitz  0.035894
+13     puncture  0.033578
+14        marty  0.032420
+15         spec  0.030104
+16        durst  0.027789
+17      fahrrad  0.026631
+18        lever  0.026631
+19    alignment  0.025473
+20       skiing  0.025473
+21         mead  0.025473
+22  diamondback  0.025473
+23        thorn  0.025473
+24     freeride  0.024315
+```
+
+Dance Clubs
+```
+      feature     tfidf
+0     bouncer  0.481651
+1   bartender  0.449306
+2   nightclub  0.344626
+3         tao  0.267550
+4     marquee  0.235435
+5      dancer  0.208825
+6    waitress  0.196208
+7     dancing  0.168069
+8       vodka  0.134884
+9       tryst  0.129225
+10   hakkasan  0.128766
+11        edm  0.105827
+12  guestlist  0.100551
+13     cabana  0.089999
+14  surrender  0.085182
+15    hostess  0.065071
+16      omnia  0.064613
+17       wynn  0.064536
+18   stripper  0.062472
+19  appetizer  0.062013
+20       limo  0.052914
+21     calvin  0.052837
+22    concert  0.051231
+23     harris  0.048249
+24     tiesto  0.047102
+```
+
+#### Insight
+Note that this took ~30 minutes using the spaCy library.  Need to analyze more what defaults are in textacy for tfidf.  The "reviewy" words are gone from this list, and in it's place are objects that are much more specific to the Yelp categories.
+
 ### With English Stop Words provided by Sklearn
 
 #### Method
