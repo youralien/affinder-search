@@ -1,6 +1,6 @@
 import io
 import os
-
+import cPickle as pickle
 import mysql.connector
 
 import numpy as np
@@ -100,9 +100,11 @@ def document_text_iterator(categories):
         with io.open(filepath, 'r', encoding='utf8') as f:
             yield f.read()
 
+
 def document_iterator(categories):
     for filepath in cats2docs(categories):
         yield filepath
+
 
 def vectorize_sklearn(categories):
     # should I use the vocabulary from something like fasttext?
@@ -128,13 +130,13 @@ def vectorize_textacy(categories):
     return (X, categories, vocabulary)
 
 
-def top_tfidf_feats(row, features, top_n=25):
-    """ Get top n tfidf values in row and return them with their corresponding
+def top_tfidf_feats(array, features, top_n=25):
+    """ Get top n tfidf values in array and return them with their corresponding
     feature names.
     Source: https://buhrmann.github.io/tfidf-analysis.html
     """
-    topn_ids = np.argsort(row)[::-1][:top_n]
-    top_feats = [(features[i], row[i]) for i in topn_ids]
+    topn_ids = np.argsort(array)[::-1][:top_n]
+    top_feats = [(features[i], array[i]) for i in topn_ids]
     df = pd.DataFrame(top_feats)
     df.columns = ['feature', 'tfidf']
     return df
@@ -147,6 +149,34 @@ def top_feats_in_doc(X, features, row_id, top_n=25):
     row = np.squeeze(X[row_id].toarray())
     return top_tfidf_feats(row, features, top_n)
 
+
+def top_docs_for_word(X, document_names, col_id, top_n=25):
+    """ Top docs by tfidf value for specific word (matrix col)
+    """
+    col = np.squeeze(X[:, col_id].toarray())
+    return top_tfidf_feats(col, document_names, top_n)
+
+
+def query_categories_by_word(word, X, categories, vocabulary, top_n=25):
+    if isinstance(vocabulary, list):
+        col_id = vocabulary.index(word)
+    elif isinstance(vocabulary, np.ndarray):
+        (col_id,), = np.where(vocabulary == word)
+
+    return top_docs_for_word(X, categories, col_id, top_n)
+
+
+def save_pickle(matrix, filename):
+    with open(filename, 'wb') as outfile:
+        pickle.dump(matrix, outfile, pickle.HIGHEST_PROTOCOL)
+
+
+def load_pickle(filename):
+    with open(filename, 'rb') as infile:
+        matrix = pickle.load(infile)
+    return matrix
+
+
 if __name__ == '__main__':
     # categories = ('Sushi Bars',
     #               'Bikes',
@@ -155,8 +185,10 @@ if __name__ == '__main__':
     categories = all_categories()
     X, categories, vocabulary = vectorize_sklearn(categories)
 
-    np.savez_compressed('tfidf/stopword-sklearn',
-        X=X, categories=categories, vocabulary=vocabulary)
+    save_pickle(X, 'tfidf/sklearn-with-stopwords-X.mtx')
+    np.savez_compressed('tfidf/sklearn-with-stopwords-meta',
+                        categories=categories, vocabulary=vocabulary)
+
     # for i, cat in enumerate(categories):
     #     print cat
     #     print top_feats_in_doc(X, vocabulary, i)

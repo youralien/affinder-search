@@ -1,6 +1,186 @@
 # Yelp Academic Dataset Mining for Affordances of a Yelp Category
 
-## TF-IDF
+## TF-IDF - Most relevant categories for a word
+
+### With 
+
+#### Method
+```python
+def query_categories_by_word(word, X, categories, vocabulary, top_n=25):
+    if isinstance(vocabulary, list):
+        col_id = vocabulary.index(word)
+    elif isinstance(vocabulary, np.ndarray):
+        (col_id,), = np.where(vocabulary == word)
+
+    return top_docs_for_word(X, categories, col_id, top_n)
+
+def top_docs_for_word(X, document_names, col_id, top_n=25):
+    """ Top docs by tfidf value for specific word (matrix col)
+    """
+    col = np.squeeze(X[:, col_id].toarray())
+    return top_tfidf_feats(col, document_names, top_n)
+
+def top_tfidf_feats(array, features, top_n=25):
+    """ Get top n tfidf values in array and return them with their corresponding
+    feature names.
+    Source: https://buhrmann.github.io/tfidf-analysis.html
+    """
+    topn_ids = np.argsort(array)[::-1][:top_n]
+    top_feats = [(features[i], array[i]) for i in topn_ids]
+    df = pd.DataFrame(top_feats)
+    df.columns = ['feature', 'tfidf']
+    return df
+```
+
+#### Data
+candles
+```
+                        feature     tfidf
+0                 Candle Stores  0.084929
+1               Religious Items  0.081032
+2            Cards & Stationery  0.047412
+3                Spiritual Shop  0.033402
+4                    Gift Shops  0.032042
+5                         Honey  0.027251
+6                       Flowers  0.025061
+7               Flowers & Gifts  0.021515
+8                 Arts & Crafts  0.020368
+9                     Tableware  0.018039
+10                   Home Decor  0.017998
+11                 Pop-up Shops  0.017876
+12               Kitchen & Bath  0.016730
+13       Psychics & Astrologers  0.016098
+14                 Art Supplies  0.013669
+15            Personal Shopping  0.013443
+16                   Bookstores  0.013171
+17                         Soba  0.011802
+18  Holiday Decorating Services  0.010427
+19                      Jewelry  0.009496
+20                Home & Garden  0.009063
+21                 Home Staging  0.008448
+22                     Churches  0.008260
+23          Holiday Decorations  0.008110
+24                     Antiques  0.007967
+```
+
+candle
+```
+                    feature     tfidf
+0           Religious Items  0.030887
+1              Ice Delivery  0.022415
+2      Immunodermatologists  0.015064
+3                   Flowers  0.011941
+4               Paint & Sip  0.011072
+5       Holiday Decorations  0.009661
+6        Cards & Stationery  0.009403
+7               Art Classes  0.008631
+8            Spiritual Shop  0.008376
+9                Beer Tours  0.008355
+10               Gift Shops  0.008291
+11            Arts & Crafts  0.007063
+12          Flowers & Gifts  0.006708
+13               Home Decor  0.006450
+14          Scavenger Hunts  0.006150
+15        Religious Schools  0.006120
+16             Art Supplies  0.006064
+17  Religious Organizations  0.004795
+18                 Churches  0.004608
+19           Kitchen & Bath  0.004473
+20                 Pub Food  0.004368
+21             Pop-up Shops  0.004259
+22            Fabric Stores  0.004176
+23       Children's Museums  0.004082
+24          Wedding Chapels  0.004021
+```
+
+beautiful
+```
+                             feature     tfidf
+0                        Calligraphy  0.203983
+1                            Flowers  0.171869
+2                 Indoor Landscaping  0.161185
+3        Holiday Decorating Services  0.139978
+4                  Botanical Gardens  0.130274
+5                          Art Tours  0.121111
+6                           Florists  0.115861
+7                     Opera & Ballet  0.102956
+8                   Wedding Planning  0.097359
+9                         Street Art  0.093276
+10     Funeral Services & Cemeteries  0.092552
+11                   Flowers & Gifts  0.090511
+12  Landmarks & Historical Buildings  0.089456
+13                   Cultural Center  0.085831
+14                       Flyboarding  0.083697
+15                        Officiants  0.083661
+16                     Country Clubs  0.080936
+17                    Horse Boarding  0.080295
+18                   Visitor Centers  0.079797
+19                             Parks  0.076435
+20                             Lakes  0.075439
+21                          Churches  0.074905
+22           Religious Organizations  0.074841
+23                         Hotel bar  0.073435
+24                   Pet Photography  0.073125
+```
+
+sitting
+```
+0               House Sitters  0.060971
+1                 Dog Walkers  0.056524
+2              Outdoor Movies  0.048842
+3             Home Developers  0.035570
+4          Storefront Clinics  0.034827
+5               Candle Stores  0.034620
+6                   Hotel bar  0.033775
+7        Commissioned Artists  0.025467
+8              Opera & Ballet  0.024891
+9                    Sledding  0.024202
+10                 Synagogues  0.023304
+11             Senior Centers  0.023249
+12            Performing Arts  0.023239
+13          Stadiums & Arenas  0.022826
+14         Pet Transportation  0.021816
+15                Courthouses  0.020840
+16            Baseball Fields  0.019245
+17                Ski Resorts  0.019219
+18               Radiologists  0.018831
+19               Comedy Clubs  0.018761
+20               Wallpapering  0.018676
+21                    Cabaret  0.018572
+22  Professional Sports Teams  0.018447
+23                    Reunion  0.018246
+24           Fire Departments  0.018119
+```
+
+jumping
+```
+0         Trampoline Parks  0.107659
+1                Skydiving  0.065636
+2               Gymnastics  0.025378
+3       Recreation Centers  0.024797
+4              Skate Parks  0.022462
+5            Rock Climbing  0.016727
+6                Laser Tag  0.016222
+7          Kids Activities  0.015811
+8           Haunted Houses  0.015034
+9          Amusement Parks  0.014790
+10         Pumpkin Patches  0.014115
+11            Hang Gliding  0.012416
+12             Playgrounds  0.012118
+13          Cannabis Tours  0.011604
+14      Addiction Medicine  0.011549
+15           Observatories  0.011336
+16              Island Pub  0.009093
+17          Horse Boarding  0.008428
+18         Leisure Centers  0.008152
+19        Attraction Farms  0.007794
+20            Pop-up Shops  0.007393
+21               Ziplining  0.007154
+22              Boat Tours  0.006873
+23  Party & Event Planning  0.006844
+24                 Surfing  0.006725
+```
+## TF-IDF - Most relevant words per category
 
 ### With defaults for word frequencies provided by spaCy + textacy
 
@@ -12,6 +192,7 @@
         weighting='tfidf', normalize=True, smooth_idf=True,
         min_df=2, max_df=0.95)
 ```
+
 
 #### Data
 
@@ -108,6 +289,33 @@ Dance Clubs
 #### Insight
 Note that this took ~30 minutes using the spaCy library.  Need to analyze more what defaults are in textacy for tfidf.  The "reviewy" words are gone from this list, and in it's place are objects that are much more specific to the Yelp categories.
 
+Combining the argument defaults of `sklearn.text.TfidfVectorizer` with the keywords I provided, I came up with the following parameters set:
+
+```
+decode_error=’strict’, strip_accents=None, lowercase=True, preprocessor=None,
+tokenizer=None, analyzer=’word’, stop_words=ENGLISH_STOP_WORDS, 
+token_pattern=’(?u)\b\w\w+\b’, ngram_range=(1, 1), max_df=1.0, min_df=1, 
+max_features=None, vocabulary=None, binary=False, dtype=<class ‘numpy.int64’>, 
+norm=’l2’, use_idf=True, smooth_idf=True, sublinear_tf=False
+```
+Now, I'll compare the parameters used for this more successful iteration.
+
+Combining the argument defaults of `textacy.Doc.to_terms_list`,
+
+```
+terms_list = (doc.to_terms_list(ngrams=1, as_strings=True, named_entities=True, normalize='lemma', lemmatize=None, lowercase=None)
+              for doc in corpus)
+```
+
+Combining the argument defaults of `textacy.Vectorizer` with the keywords I provided, I came up with the following parameters set:
+
+```
+weighting='tfidf', normalize=True, sublinear_tf=False, smooth_idf=True,
+vocabulary=None, min_df=2, max_df=0.95, min_ic=0.0, max_n_terms=None
+```
+
+
+
 ### With English Stop Words provided by Sklearn
 
 #### Method
@@ -115,6 +323,9 @@ Note that this took ~30 minutes using the spaCy library.  Need to analyze more w
     vect = TfidfVectorizer(input='filename',
         vocabulary=None, stop_words=ENGLISH_STOP_WORDS)
 ```
+
+
+
 
 #### Data
 Sushi Bars
