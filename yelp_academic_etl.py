@@ -98,7 +98,10 @@ def create_all_documents():
 def document_text_iterator(categories):
     for filepath in cats2docs(categories):
         with io.open(filepath, 'r', encoding='utf8') as f:
-            yield f.read()
+            # Note: trying to fix this
+            # ValueError: String is too long: 1775824025 characters.
+            # Max is 2**30.
+            yield f.read()[:2**30 - 1]
 
 
 def document_iterator(categories):
@@ -115,12 +118,32 @@ def vectorize_sklearn(categories):
     return (X, categories, vocabulary)
 
 
+def get_corpus(categories, filepath='.', name='yelp', compression='gzip'):
+    """
+    Note: Currently, I think the document containing all the reviews is too
+    long. spaCy complains:
+
+    ValueError: String is too long: 1775824025 characters. Max is 2**30.
+    """
+
+    if os.path.exists(os.path.join(filepath, "%s_info.json" % name)):
+        return textacy.Corpus.load(filepath, name=name,
+                                   compression=compression)
+    else:
+        corpus = textacy.Corpus(spacy.load('en'),
+                                texts=document_text_iterator(categories))
+        corpus.save(filepath, name=name, compression=compression)
+        return corpus
+
+
 def vectorize_textacy(categories):
 
-    corpus = textacy.Corpus(spacy.load('en'),
-                            texts=document_text_iterator(categories))
+    print("Parsing Documents with spaCy")
+    corpus = get_corpus(categories)
+    print("Terms list")
     terms_list = (doc.to_terms_list(ngrams=1, as_strings=True)
                   for doc in corpus)
+    print("Vectorizing")
     vect = textacy.Vectorizer(
         weighting='tfidf', normalize=True, smooth_idf=True,
         min_df=2, max_df=0.95)
@@ -183,10 +206,10 @@ if __name__ == '__main__':
     #               'Dance Clubs')
 
     categories = all_categories()
-    X, categories, vocabulary = vectorize_sklearn(categories)
+    X, categories, vocabulary = vectorize_textacy(categories)
 
-    save_pickle(X, 'tfidf/sklearn-with-stopwords-X.mtx')
-    np.savez_compressed('tfidf/sklearn-with-stopwords-meta',
+    save_pickle(X, 'tfidf/textacy-X.mtx')
+    np.savez_compressed('tfidf/textacy-meta',
                         categories=categories, vocabulary=vocabulary)
 
     # for i, cat in enumerate(categories):
