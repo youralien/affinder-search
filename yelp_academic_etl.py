@@ -166,6 +166,20 @@ def query_categories_by_word(word, X, categories, vocabulary, top_n=25):
     return top_docs_for_word(X, categories, col_id, top_n)
 
 
+def query_categories_by_many(words, X, categories, vocabulary):
+    """ using syntax...
+    df1.merge(df2,on='name').merge(df3,on='name')
+    """
+    dfs = [query_categories_by_word(word, X, categories, vocabulary, 100)
+           for word in words]
+
+    chained_merge_cmd = "dfs[%d].merge(dfs[%d],on='feature')" % (0, 1)
+    for i in range(2, len(dfs)):
+        chained_merge_cmd += ".merge(dfs[%d],on='feature')" % i
+
+    return eval(chained_merge_cmd)
+
+
 def save_pickle(matrix, filename):
     with open(filename, 'wb') as outfile:
         pickle.dump(matrix, outfile, pickle.HIGHEST_PROTOCOL)
@@ -175,6 +189,12 @@ def load_pickle(filename):
     with open(filename, 'rb') as infile:
         matrix = pickle.load(infile)
     return matrix
+
+
+def load_tfidf(fileprefix):
+    X = load_pickle('tfidf/%s-X.mtx' % fileprefix)
+    meta = np.load('tfidf/%s-meta.npz' % fileprefix)
+    return X, meta['categories'], meta['vocabulary']
 
 
 if __name__ == '__main__':
