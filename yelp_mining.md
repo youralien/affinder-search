@@ -1,8 +1,74 @@
 # Yelp Academic Dataset Mining for Affordances of a Yelp Category
 
-## TF-IDF - Most relevant categories for a word
+## Affordance Language Demo
 
-### With 
+### natural language to keywords: sklearn stopwords; yelp categories from sklearn tfidf with stopwords joined for each word
+
+```
+Loading...
+Type a natural language affordance requirement:
+
+{'affordance.   ': 'Someone in a downtown riding their bike\n',
+ 'keywords      ': ['downtown', 'riding', 'bike']}
+{'yelp category ': [u'Public Transportation',
+                    u'Bar Crawl',
+                    u'Historical Tours',
+                    u'Public Services & Government',
+                    u'Scooter Rentals',
+                    u'Bike Sharing',
+                    u'Transportation',
+                    u'Bus Tours',
+                    u'Tours',
+                    u'Beaches',
+                    u'Party Bike Rentals',
+                    u'Parks',
+                    u'Trains']}
+Type another affordance query:
+
+{'affordance.   ': 'Someone with a box and tape\n',
+ 'keywords      ': ['box', 'tape']}
+{'yelp category ': [u'Notaries',
+                    u'Shipping Centers',
+                    u'Mailbox Centers',
+                    u'Post Offices',
+                    u'Shredding Services',
+                    u'Printing Services',
+                    u'Signmaking',
+                    u'Couriers & Delivery Services',
+                    u'Hardware Stores',
+                    u'Gift Shops',
+                    u'Propane',
+                    u'Mass Media',
+                    u'Public Services & Government',
+                    u'Car Stereo Installation',
+                    u'Appliances',
+                    u'Office Equipment',
+                    u'Movers',
+                    u'Nurseries & Gardening',
+                    u'Self Storage',
+                    u'Videos & Video Game Rental',
+                    u'Building Supplies',
+                    u'Professional Services',
+                    u'Local Services',
+                    u'Packing Supplies',
+                    u'Truck Rental',
+                    u'Packing Services',
+                    u'Auction Houses',
+                    u'Trophy Shops',
+                    u'Digitizing Services',
+                    u'Music & Video',
+                    u'Mags',
+                    u'Books',
+                    u'Music & DVDs',
+                    u'Discount Store',
+                    u'Estate Liquidation']}
+```
+
+####
+
+## TF-IDF - Most relevant categories for a word 
+
+### With TFIDF features coming from sklearn with stopwords, on all documents
 
 #### Method
 ```python
@@ -180,6 +246,14 @@ jumping
 23  Party & Event Planning  0.006844
 24                 Surfing  0.006725
 ```
+
+#### Insights
+Candle and Candles give different lists.  There may be some overlaps, but Candle Shops as a category wasn't even in the top 25 for "candle", while it was #1 for "candles".  We're losing out on information if we only query for one or the other.
+
+One fix is lemmatization during the parsing/vectorizing step of the documents.  We would have only one word representing candle.
+
+Another fix is to use word embeddings to find related words to candle.  That might lead us to candles (and probably other words too, like light, wax). Then we can combine their tfidf scores in some way to balance this out.
+
 ## TF-IDF - Most relevant words per category
 
 ### With defaults for word frequencies provided by spaCy + textacy
