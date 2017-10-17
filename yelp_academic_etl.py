@@ -124,14 +124,16 @@ def vectorize_sklearn(categories):
 
 def get_doc(text, category, path):
     # TODO(rlouie): check if this check actually does something
-    if (os.path.exists(os.path.join(path, "%sspacy_doc.bin" % category)) and
-            os.path.exists(os.path.join(path, "%smetadata.json" % category))):
-        return textacy.Doc.load(path, category)
+    cat = category.replace('/', '-')
+    if (os.path.exists(os.path.join(path, "%s_spacy_doc.bin" % cat)) and
+            os.path.exists(os.path.join(path, "%s_metadata.json" % cat))):
+        return textacy.Doc.load(path, cat)
     else:
         global SPACY_EN_NLP
         if SPACY_EN_NLP is None:
-            SPACY_EN_NLP = spacy.load('en')
+            SPACY_EN_NLP = spacy.load('en_core_web_sm')
         doc = textacy.Doc(content=text, lang=SPACY_EN_NLP)
+        doc.save(path, name=cat)
         return doc
 
 
@@ -144,11 +146,8 @@ def textacy_doc_generator(categories, folderpath='parsed-docs'):
 
 def vectorize_textacy(categories):
 
-    print("Parsing Documents with spaCy")
-    print("Terms list")
     terms_list = (doc.to_terms_list(ngrams=1, as_strings=True)
                   for doc in textacy_doc_generator(categories))
-    print("Vectorizing")
     vect = textacy.Vectorizer(
         weighting='tfidf', normalize=True, smooth_idf=True,
         min_df=2, max_df=0.95)
