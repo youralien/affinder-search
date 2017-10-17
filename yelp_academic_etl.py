@@ -166,13 +166,24 @@ def query_categories_by_word(word, X, categories, vocabulary, top_n=25):
     return top_docs_for_word(X, categories, col_id, top_n)
 
 
-def query_categories_by_many(words, X, categories, vocabulary, how='inner'):
+def query_categories_by_many(words, X, categories, vocabulary, how='inner',
+                             top_n=100):
     """ using syntax...
     df1.merge(df2,on='name').merge(df3,on='name')
     """
-    dfs = [query_categories_by_word(word, X, categories, vocabulary, 100)
-           for word in words]
+    dfs = []
+    for word in words:
+        try:
+            df = query_categories_by_word(word, X, categories, vocabulary,
+                                          top_n)
+            dfs.append(df)
+        except ValueError:
+            print("Ignoring ", word)
+            continue
+    return merge_many_dfs(dfs, how)
 
+
+def merge_many_dfs(dfs, how):
     chained_merge_cmd = (
         "dfs[%d].merge(dfs[%d],how='%s',on='feature')" % (0, 1, how))
     for i in range(2, len(dfs)):
