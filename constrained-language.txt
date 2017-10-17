@@ -1,2 +1,6 @@
 person
 really
+somebody
+someone
+noone
+nobody
