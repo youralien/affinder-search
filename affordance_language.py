@@ -3,6 +3,7 @@ from itertools import cycle
 # from random import shuffle
 from pprint import pprint
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+from gensim.models import KeyedVectors
 
 import yelp_academic_etl as etl
 
@@ -54,6 +55,8 @@ def preload_affordances(txtfile):
 def main():
 
     print("Loading...")
+    EMBEDDING = KeyedVectors.load_word2vec_format('wiki.en/wiki.en.vec',
+                                                  limit=100000)
     affs = preload_affordances("storytime_affordances.txt")
     # shuffle(affs)
     affs_generator = cycle(affs)
@@ -71,14 +74,35 @@ def main():
         obj1["keywords      "] = keywords
         pprint(obj1)
 
-        try:
-            cats_tfidf = etl.query_categories_by_many(keywords, X, cats, vocab)
-            categories = list(cats_tfidf["feature"].get_values())
-            obj2 = {}
-            obj2["yelp category "] = categories
-            pprint(obj2)
-        except ValueError:
-            print("A keyword was not found in the vocabulary! Whoops")
+        # expand your keywords, and thus the categories
+        dfs = []
+        for kw in keywords:
+            if kw not in CONSTRAINED_LANGUAGE:
+                try:
+                    similar_kws = map(lambda x: x[0],
+                                      EMBEDDING.most_similar(kw)[:3])
+                    similar_kws.append(kw)
+                    print similar_kws
+
+                    # by taking union of similar keywords
+                    dfs.append(etl.query_categories_by_many(similar_kws,
+                                                            X,
+                                                            cats,
+                                                            vocab,
+                                                            'outer',
+                                                            50))
+                except KeyError:
+                    # Word not in embedding vocab
+                    dfs.append(etl.query_categories_by_word(kw, X, cats,
+                                                            vocab, 50))
+
+        # take the intersection of all the words
+        cats_tfidf = etl.merge_many_dfs(dfs, 'inner')
+        # cats_tfidf = etl.query_categories_by_many(keywords, X, cats, vocab)
+        categories = list(cats_tfidf["feature"].get_values())
+        obj2 = {}
+        obj2["yelp category "] = categories
+        pprint(obj2)
 
         query = raw_input("Type another affordance query:\n")
 
