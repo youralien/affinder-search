@@ -54,6 +54,7 @@ def preload_affordances(txtfile):
 
 def main():
 
+    top_n = 50
     print("Loading...")
     EMBEDDING = KeyedVectors.load_word2vec_format('wiki.en/wiki.en.vec',
                                                   limit=100000)
@@ -90,11 +91,11 @@ def main():
                                                             cats,
                                                             vocab,
                                                             'outer',
-                                                            50))
+                                                            top_n))
                 except KeyError:
                     # Word not in embedding vocab
                     dfs.append(etl.query_categories_by_word(kw, X, cats,
-                                                            vocab, 50))
+                                                            vocab, top_n))
 
         # take the intersection of all the words
         cats_tfidf = etl.merge_many_dfs(dfs, 'inner')
