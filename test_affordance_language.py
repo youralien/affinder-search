@@ -10,3 +10,6 @@ def test_natlang2keywords():
             natlang2keywords("cat, box\n"))
     assert (['cat', 'dog'] ==
             natlang2keywords("person with a cat and dog\n"))
+    assert (['forgiving', 'friend', 'eggs'] ==
+            natlang2keywords(
+                'Someone with a really forgiving friend + eggs\n'))

@@ -39,7 +39,7 @@ def natlang2keywords(aff):
     keywords = []
     for w in words:
         w_stripped = regex.sub('', w)
-        if w_stripped not in CONSTRAINED_LANGUAGE:
+        if w_stripped and w_stripped not in CONSTRAINED_LANGUAGE:
             keywords.append(w_stripped)
     return keywords
 
