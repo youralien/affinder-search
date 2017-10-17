@@ -72,6 +72,28 @@ Type another affordance query:
                     u'Lighting Fixtures & Equipment',
                     u'Electronics',
                     u'Videos & Video Game Rental']}
+
+{'affordance.   ': 'Someone with a kitchen and food\n',
+ 'keywords      ': ['kitchen', 'food']}
+[u'kitchens', u'bathroom', u'upstairs', 'kitchen']
+[u'foods', u'foodstuffs', u'foodstuff', 'food']
+{'yelp category ': [u'Kitchen & Bath',
+                    u'Food Banks',
+                    u'Interior Design',
+                    u'Flea Markets',
+                    u'Outdoor Furniture Stores',
+                    u'Home & Garden',
+                    u'Spanish',
+                    u'Furniture Stores',
+                    u'Home Decor',
+                    u'Food Court',
+                    u'Newspapers & Magazines',
+                    u'Hunting & Fishing Supplies',
+                    u'Bowling',
+                    u'Scottish',
+                    u'Irish',
+                    u'Wholesalers',
+                    u'Personal Chefs']}
 ```
 
 ### natural language to keywords: sklearn stopwords; yelp categories from sklearn tfidf with stopwords joined for each word
