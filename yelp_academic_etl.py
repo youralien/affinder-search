@@ -14,6 +14,10 @@ import spacy
 import textacy
 
 
+SPACY_EN_NLP = None
+SPACY_MAX_DOC_LENGTH = 2**30 - 1
+
+
 def cat2doc(cat):
     """Sushi Bars -> Sushi Bars.txt
     From Category to Document filepath """
@@ -101,7 +105,7 @@ def document_text_iterator(categories):
             # Note: trying to fix this
             # ValueError: String is too long: 1775824025 characters.
             # Max is 2**30.
-            yield f.read()[:2**30 - 1]
+            yield f.read()[:SPACY_MAX_DOC_LENGTH]
 
 
 def document_iterator(categories):
@@ -118,31 +122,32 @@ def vectorize_sklearn(categories):
     return (X, categories, vocabulary)
 
 
-def get_corpus(categories, filepath='.', name='yelp', compression='gzip'):
-    """
-    Note: Currently, I think the document containing all the reviews is too
-    long. spaCy complains:
-
-    ValueError: String is too long: 1775824025 characters. Max is 2**30.
-    """
-
-    if os.path.exists(os.path.join(filepath, "%s_info.json" % name)):
-        return textacy.Corpus.load(filepath, name=name,
-                                   compression=compression)
+def get_doc(text, category, path):
+    # TODO(rlouie): check if this check actually does something
+    if (os.path.exists(os.path.join(path, "%sspacy_doc.bin" % category)) and
+            os.path.exists(os.path.join(path, "%smetadata.json" % category))):
+        return textacy.Doc.load(path, category)
     else:
-        corpus = textacy.Corpus(spacy.load('en'),
-                                texts=document_text_iterator(categories))
-        corpus.save(filepath, name=name, compression=compression)
-        return corpus
+        global SPACY_EN_NLP
+        if SPACY_EN_NLP is None:
+            SPACY_EN_NLP = spacy.load('en')
+        doc = textacy.Doc(content=text, lang=SPACY_EN_NLP)
+        return doc
+
+
+def textacy_doc_generator(categories, folderpath='parsed-docs'):
+    texts = document_text_iterator(categories)
+    for category, text in zip(categories, texts):
+        print(category)
+        yield get_doc(text, category, folderpath)
 
 
 def vectorize_textacy(categories):
 
     print("Parsing Documents with spaCy")
-    corpus = get_corpus(categories)
     print("Terms list")
     terms_list = (doc.to_terms_list(ngrams=1, as_strings=True)
-                  for doc in corpus)
+                  for doc in textacy_doc_generator(categories))
     print("Vectorizing")
     vect = textacy.Vectorizer(
         weighting='tfidf', normalize=True, smooth_idf=True,
