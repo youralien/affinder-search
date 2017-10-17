@@ -1,9 +1,25 @@
+import re
 from itertools import cycle
-from random import shuffle
+# from random import shuffle
 from pprint import pprint
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 import yelp_academic_etl as etl
+
+
+def create_constrained_language():
+    lang = set(ENGLISH_STOP_WORDS)
+
+    with open('constrained-language.txt', 'r') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        w = line.strip().lower()
+        lang.add(w)
+
+    return lang
+
+CONSTRAINED_LANGUAGE = create_constrained_language()
 
 
 def natlang2keywords(aff):
@@ -18,15 +34,14 @@ def natlang2keywords(aff):
     keywords: list of str
         i.e. ['downtown', 'riding', 'bike']
     """
-    return [w for w in aff.lower().strip().split(' ')
-            if w not in ENGLISH_STOP_WORDS]
-
-
-def test_natlang2keywords():
-    assert (['downtown', 'riding', 'bike'] ==
-            natlang2keywords("Someone in a downtown riding their bike"))
-    assert (['downtown', 'riding', 'bike'] ==
-            natlang2keywords("Someone in a downtown riding their bike\n"))
+    words = aff.strip().lower().split(' ')
+    regex = re.compile('[^a-z]')
+    keywords = []
+    for w in words:
+        w_stripped = regex.sub('', w)
+        if w_stripped not in CONSTRAINED_LANGUAGE:
+            keywords.append(w_stripped)
+    return keywords
 
 
 def preload_affordances(txtfile):
