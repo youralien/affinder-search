@@ -73,6 +73,10 @@ def test_query_categories():
     query_categories_by_word("jumping", X, cats, vocab)
     query_categories_by_many(("jumping", "beautiful"), X, cats, vocab)
     query_categories_by_many(("jumping", "beautiful", "sun"), X, cats, vocab)
+    query_categories_by_many(("jumping", "beautiful"), X, cats, vocab, 'outer')
+    query_categories_by_many(("jumping", "beautiful", "sun"), X, cats, vocab,
+                             'outer')
+
 
 # def test_vectorizer_textacy():
 #     X, categories, vocabulary = vectorize_textacy('Japanese')
