@@ -2,6 +2,78 @@
 
 ## Affordance Language Demo
 
+### nlu keywords; constrained language; union of embedding keywords and intersection of these cats
+```
+Loading...
+Type a natural language affordance requirement:
+
+{'affordance.   ': 'Someone in a downtown riding their bike\n',
+ 'keywords      ': ['downtown', 'riding', 'bike']}
+[u'midtown', u'blvd', u'avenue', 'downtown']
+[u'ridings', u'horseback', u'rode', 'riding']
+[u'bikes', u'bicycle', u'bicycles', 'bike']
+{'yelp category ': [u'Bike Shop',
+                    u'Bicycles',
+                    u'Community Service/Non-Profit',
+                    u'Parks',
+                    u'Sports Clubs',
+                    u'Scooter Tours',
+                    u'Public Transportation',
+                    u'Scooter Rentals',
+                    u'Motorsport Vehicle Dealers',
+                    u'Bed & Breakfast',
+                    u'Hiking',
+                    u'Bar Crawl',
+                    u'Historical Tours',
+                    u'Bike Sharing']}
+Type another affordance query:
+
+{'affordance.   ': 'Someone with a box and tape\n',
+ 'keywords      ': ['box', 'tape']}
+[u'containing', u'watched', u'boxes', 'box']
+[u'tapes', u'videotape', u'cassette', 'tape']
+{'yelp category ': [u'Museums',
+                    u'Historical Tours',
+                    u'Uniforms',
+                    u'Shipping Centers',
+                    u'Television Stations',
+                    u'Performing Arts',
+                    u'Professional Sports Teams',
+                    u'Landmarks & Historical Buildings',
+                    u'Mass Media',
+                    u'Amusement Parks',
+                    u'Ticket Sales',
+                    u'Medical Law',
+                    u'Public Services & Government',
+                    u'Arts & Entertainment',
+                    u'Packing Supplies',
+                    u'Movers',
+                    u'Self Storage',
+                    u'Shredding Services',
+                    u'Propane',
+                    u'Luggage Storage',
+                    u'Packing Services',
+                    u'Post Offices',
+                    u'Notaries',
+                    u'Mailbox Centers',
+                    u'Couriers & Delivery Services',
+                    u'Printing Services',
+                    u'Signmaking',
+                    u'Furniture Assembly',
+                    u'Interval Training Gyms',
+                    u'Comic Books',
+                    u'Internet Service Providers',
+                    u'Local Services',
+                    u'Estate Liquidation',
+                    u'Office Equipment',
+                    u'Discount Store',
+                    u'Hardware Stores',
+                    u'Car Stereo Installation',
+                    u'Lighting Fixtures & Equipment',
+                    u'Electronics',
+                    u'Videos & Video Game Rental']}
+```
+
 ### natural language to keywords: sklearn stopwords; yelp categories from sklearn tfidf with stopwords joined for each word
 
 ```
