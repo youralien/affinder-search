@@ -71,11 +71,14 @@ def main():
         obj1["keywords      "] = keywords
         pprint(obj1)
 
-        cats_tfidf = etl.query_categories_by_many(keywords, X, cats, vocab)
-        categories = list(cats_tfidf["feature"].get_values())
-        obj2 = {}
-        obj2["yelp category "] = categories
-        pprint(obj2)
+        try:
+            cats_tfidf = etl.query_categories_by_many(keywords, X, cats, vocab)
+            categories = list(cats_tfidf["feature"].get_values())
+            obj2 = {}
+            obj2["yelp category "] = categories
+            pprint(obj2)
+        except ValueError:
+            print("A keyword was not found in the vocabulary! Whoops")
 
         query = raw_input("Type another affordance query:\n")
 
