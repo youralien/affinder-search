@@ -1,6 +1,6 @@
 import re
 from itertools import cycle
-# from random import shuffle
+from random import shuffle
 from pprint import pprint
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from gensim.models import KeyedVectors
@@ -52,14 +52,14 @@ def preload_affordances(txtfile):
     return affs
 
 
-def main():
+def yelp_places():
 
     top_n = 50
     print("Loading...")
     EMBEDDING = KeyedVectors.load_word2vec_format('wiki.en/wiki.en.vec',
                                                   limit=100000)
     affs = preload_affordances("storytime_affordances.txt")
-    # shuffle(affs)
+    shuffle(affs)
     affs_generator = cycle(affs)
     X, cats, vocab = etl.load_tfidf("sklearn-with-stopwords")
 
@@ -107,5 +107,54 @@ def main():
 
         query = raw_input("Type another affordance query:\n")
 
+
+def builtin_legos():
+
+    print("Loading...")
+    from lego_word_associations import lego_words
+
+    EMBEDDING = KeyedVectors.load_word2vec_format('wiki.en/wiki.en.vec',
+                                                  limit=100000)
+    affs = preload_affordances("storytime_affordances.txt")
+    shuffle(affs)
+    affs_generator = cycle(affs)
+
+    query = raw_input("Type a natural language affordance requirement:\n")
+    while (query != 'q'):
+
+        if query == '':
+            query = next(affs_generator)
+
+        keywords = set(natlang2keywords(query))
+        obj1 = {}
+        obj1["affordance.   "] = query
+        obj1["keywords      "] = keywords
+
+        expand_keywords = True
+        if expand_keywords:
+            for og_kw in keywords.copy():
+                first_degree_kws = map(lambda tup: tup[0],
+                                       EMBEDDING.most_similar(og_kw))
+
+                for fd_kw in first_degree_kws:
+                    keywords.add(fd_kw)
+                    second_degree_kws = map(lambda tup: tup[0],
+                                            EMBEDDING.most_similar(fd_kw))
+                    for sd_kw in second_degree_kws:
+                        keywords.add(sd_kw)
+
+        obj1["expanded words"] = keywords
+
+        legos = set()
+        for kw in keywords:
+            for lego, word_assoc in lego_words.iteritems():
+                if kw in word_assoc:
+                    legos.add(lego)
+
+        obj1["legos         "] = legos
+        pprint(obj1)
+
+        query = raw_input("Type another affordance query:\n")
+
 if __name__ == '__main__':
-    main()
+    builtin_legos()
