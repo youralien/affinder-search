@@ -10,11 +10,15 @@ lego_words = {
         "race",
         "run",
         "running"
+        "pump iron",
+        "pumping iron"
     ],
     "inside": [
         "run",
         "shop",
-        "shopping",
+        "shopping"
+        "pump iron",
+        "pumping iron"
     ],
     "high-elevation": [
         "ski",
@@ -44,5 +48,12 @@ lego_words = {
     ],
     "high-elevation": [
         "mountains"
+    ],
+    "heavy-breathing": [
+        "pump iron",
+        "pumping iron",
+        "race",
+        "run",
+        "running"
     ]
 }
