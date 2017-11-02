@@ -1,3 +1,4 @@
+import os
 import re
 from itertools import cycle
 from random import shuffle
@@ -11,7 +12,8 @@ import yelp_academic_etl as etl
 def create_constrained_language():
     lang = set(ENGLISH_STOP_WORDS)
 
-    with open('constrained-language.txt', 'r') as f:
+    with open(os.path.join(os.path.dirname(__file__),
+              'constrained-language.txt'), 'r') as f:
         lines = f.readlines()
 
     for line in lines:
@@ -266,4 +268,4 @@ def builtin_legos_syn_emb():
         query = raw_input("Type another affordance query:\n")
 
 if __name__ == '__main__':
-    builtin_legos_syn()
+    yelp_places()

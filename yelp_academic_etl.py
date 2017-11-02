@@ -204,8 +204,10 @@ def load_pickle(filename):
 
 
 def load_tfidf(fileprefix):
-    X = load_pickle('tfidf/%s-X.mtx' % fileprefix)
-    meta = np.load('tfidf/%s-meta.npz' % fileprefix)
+    X = load_pickle(os.path.join(os.path.dirname(__file__),
+                    'tfidf/%s-X.mtx' % fileprefix))
+    meta = np.load(os.path.join(os.path.dirname(__file__),
+                   'tfidf/%s-meta.npz' % fileprefix))
     return X, meta['categories'], meta['vocabulary']
 
 
