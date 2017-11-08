@@ -8,7 +8,8 @@ python search_yelp_places.py "someone who is walking their dog"
 """
 import json
 from affordance_language import natlang2keywords
-from yelp_academic_etl import load_tfidf, query_categories_by_many
+from yelp_academic_etl import (
+    load_tfidf, query_categories_by_many, query_categories_by_word)
 
 
 def search_yelp_places_that_afford(query):
@@ -20,7 +21,11 @@ def search_yelp_places_that_afford(query):
     X, cats, vocab = load_tfidf("sklearn-with-stopwords")
     keywords = natlang2keywords(query)
 
-    cats_tfidf = query_categories_by_many(keywords, X, cats, vocab)
+    if len(keywords) == 1:
+        cats_tfidf = query_categories_by_word(keywords[0], X, cats, vocab)
+    else:
+        cats_tfidf = query_categories_by_many(keywords, X, cats, vocab)
+
     categories = list(cats_tfidf["feature"].get_values())
     return categories
 
