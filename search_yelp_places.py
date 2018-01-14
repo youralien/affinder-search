@@ -27,7 +27,9 @@ def search_yelp_places_that_afford(query):
         cats_tfidf = query_categories_by_many(keywords, X, cats, vocab)
 
     categories = list(cats_tfidf["feature"].get_values())
-    return categories
+    weights = list(cats_tfidf["tfidf"].get_values())
+
+    return zip(categories, weights)
 
 
 if __name__ == '__main__':
@@ -41,6 +43,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     place_categories = search_yelp_places_that_afford(args.query)
-    place_categories = [elem.encode('ascii', 'ignore')
-                        for elem in place_categories]
+    place_categories = [(cat.encode('ascii', 'ignore'), weight)
+                        for cat, weight in place_categories]
     print(json.dumps(place_categories))
