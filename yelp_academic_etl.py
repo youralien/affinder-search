@@ -167,20 +167,25 @@ def query_categories_by_word(word, X, categories, vocabulary, top_n=25):
 
 
 def query_categories_by_many(words, X, categories, vocabulary, how='inner',
-                             top_n=100):
+                             top_n=25):
     """ using syntax...
     df1.merge(df2,on='name').merge(df3,on='name')
     """
     dfs = []
     for word in words:
         try:
+            # we use 4 * top_n because the intersection of 100 (default) top
+            # categories for many words is a set that is likely to be small
             df = query_categories_by_word(word, X, categories, vocabulary,
-                                          top_n)
+                                          4 * top_n)
             dfs.append(df)
         except ValueError:
             print("Ignoring ", word)
             continue
-    return merge_many_dfs(dfs, how)
+    combo_df = merge_many_dfs(dfs, how)
+    combo_df["tfidf"] = combo_df.sum(axis=1)
+    combo_df = combo_df.sort_values("tfidf", ascending=False)
+    return combo_df[:top_n]
 
 
 def merge_many_dfs(dfs, how):
