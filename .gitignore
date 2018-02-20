@@ -94,3 +94,6 @@ ENV/
 .ropeproject
 
 .DS_Store
+*.zip
+*.sublime-workspace
+
