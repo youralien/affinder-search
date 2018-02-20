@@ -6,6 +6,24 @@ You can find the TF-IDF matrix and the corresponding metadata [via this Dropbox 
 
 ### Installation
 
+For production, certain packages are only needed.  They can be found in `requirements.txt`.
+
+For local development, which includes training of the system, we list all supported packages in `dev-requirements.txt`
+
+Recommend using virtiualenv, by creating both prod and dev virtualenvs.
+#### Production
+```
+virtualenv prod
+pip install -r requirements.txt
+```
+```
+
+#### Development
+```
+virtualenv dev
+pip install -r dev-requirements.txt
+```
+
 pip freeze > requirements.txt
 
 pip install -r requirements.txt
