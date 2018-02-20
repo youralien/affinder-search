@@ -19,11 +19,9 @@ pip install -r requirements.txt
 ```
 
 #### Development
+
 ```
 virtualenv dev
+brew install mysql
 pip install -r dev-requirements.txt
 ```
-
-pip freeze > requirements.txt
-
-pip install -r requirements.txt
