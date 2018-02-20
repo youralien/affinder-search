@@ -1,1 +1,1 @@
-web: python main.py
+web: python search_yelp_places_server.py
