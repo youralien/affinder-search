@@ -2,7 +2,7 @@
 # @Author: youralien
 # @Date:   2018-02-20 02:05:38
 # @Last Modified by:   youralien
-# @Last Modified time: 2018-02-20 02:38:52
+# @Last Modified time: 2018-02-20 06:31:12
 
 from flask import Flask, jsonify
 
@@ -27,14 +27,10 @@ def retrieve_yelp_categories(query):
                                               top_n=25)
 
     categories = list(cats_tfidf["feature"].get_values())
-    weights = list(cats_tfidf["tfidf"].get_values())
 
-    categories = zip(categories, weights)
-    categories = [(cat.encode('ascii', 'ignore'), weight)
-                  for cat, weight in categories]
-
+    print(categories)
     return jsonify(categories)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000, host='localhost')
+    app.run(port=8000, host='localhost')
