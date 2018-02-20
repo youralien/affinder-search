@@ -1,8 +1,6 @@
 import os
-import cPickle as pickle
-
+import pickle
 import numpy as np
-
 import pandas as pd
 
 
@@ -29,7 +27,8 @@ def top_feats_in_doc(X, features, row_id, top_n=25):
 def top_docs_for_word(X, document_names, col_id, top_n=25):
     """ Top docs by tfidf value for specific word (matrix col)
     """
-    col = np.squeeze(X[:, col_id].toarray())
+    col = X[:, col_id].toarray()
+    col = np.squeeze(col)
     return top_tfidf_feats(col, document_names, top_n)
 
 
@@ -75,7 +74,12 @@ def merge_many_dfs(dfs, how):
 
 def load_pickle(filename):
     with open(filename, 'rb') as infile:
-        matrix = pickle.load(infile)
+        try:
+            matrix = pickle.load(infile)
+        except UnicodeDecodeError:
+            # Python 2 object to Python 3
+            infile.seek(0)
+            matrix = pickle.load(infile, encoding="latin-1")
     return matrix
 
 
