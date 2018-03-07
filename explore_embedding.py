@@ -9,8 +9,7 @@ from gensim.models import KeyedVectors
 from scipy.spatial.distance import cdist
 
 from affordance_language import natlang2keywords
-from yelp_academic_etl import (
-    load_tfidf, query_categories_by_many, query_categories_by_word)
+from yelp_academic_etl import load_tfidf
 
 EMB = KeyedVectors.load_word2vec_format('wiki.en/wiki.en.vec',
                                         limit=100000)
@@ -22,6 +21,7 @@ N_CATS = len(cats)
 
 def single_word_expansion():
     print(map(lambda x: x[0], EMB.most_similar(raw_input("kw: "))))
+
 
 def sentence_embedding(keywords):
     try:
@@ -44,8 +44,7 @@ def sentence_embedding(keywords):
         return np.zeros(300)
 
 
-def phrase_expansion():
-    query = raw_input("query: ")
+def query_expansion(query):
     keywords = natlang2keywords(query)
     q_emb = sentence_embedding(keywords)
     # TODO(rlouie): which tfidf weights do you use?  average of all?
@@ -61,8 +60,8 @@ def phrase_expansion():
         expansions.append(similar_kws)
 
     kw_phrases = [e for e in product(*expansions)]
-    phrase_embeddings = np.vstack([sentence_embedding(e) for e in product(*expansions)])
-    print phrase_embeddings.shape
+    phrase_embeddings = np.vstack(
+        [sentence_embedding(e) for e in product(*expansions)])
 
     distances = cdist(phrase_embeddings, q_emb.reshape(1, -1), 'cosine').flatten()
     idxs = np.argsort(distances)
@@ -71,7 +70,8 @@ def phrase_expansion():
     for e in final_kws:
         print(" ".join(e))
 
+    return final_kws
+
 if __name__ == '__main__':
-    # pass
     while True:
-        phrase_expansion()
+        query_expansion(raw_input("query: "))
