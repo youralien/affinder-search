@@ -68,7 +68,8 @@ def phrase_expansion():
     idxs = np.argsort(distances)
     idxs = idxs[:int(1.5 * np.log2(len(idxs)))]
     final_kws = [kw_phrases[idx] for idx in idxs]
-    print final_kws
+    for e in final_kws:
+        print(" ".join(e))
 
 if __name__ == '__main__':
     # pass

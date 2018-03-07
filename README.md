@@ -10,6 +10,10 @@ https://s3-us-west-1.amazonaws.com/fasttext-vectors/wiki.en.zip
 
 Save to `wiki.en` folder
 
+### Files of Interest
+
+`python explore_embedding.py`
+
 ### Installation
 
 For production, certain packages are only needed.  They can be found in `requirements.txt`.
@@ -21,7 +25,6 @@ Recommend using virtiualenv, by creating both prod and dev virtualenvs.
 ```
 virtualenv prod
 pip install -r requirements.txt
-```
 ```
 
 #### Development
