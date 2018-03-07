@@ -2,9 +2,10 @@
 # @Author: youralien
 # @Date:   2018-02-20 02:05:38
 # @Last Modified by:   youralien
-# @Last Modified time: 2018-03-06 21:03:39
+# @Last Modified time: 2018-03-06 23:02:44
 
 from flask import Flask, jsonify
+from ordered_set import OrderedSet
 
 from yelp_academic_etl import (
     load_tfidf, query_categories_by_many, query_categories_by_word)
@@ -21,7 +22,7 @@ def retrieve_yelp_categories(query):
 
     expanded_keywords = query_expansion(query)
 
-    accum_cats = set()
+    accum_cats = OrderedSet()
     for keywords in expanded_keywords:
         if len(keywords) == 1:
             cats_tfidf = query_categories_by_word(keywords[0], X, cats, vocab,
