@@ -4,6 +4,12 @@
 
 You can find the TF-IDF matrix and the corresponding metadata [via this Dropbox link](https://www.dropbox.com/sh/hn4t4k9zbppm6dd/AAArh08p3n6C0YQAfsDGqVxda?dl=0).  You'll create a folder called `tfidf` at the top-level directory of this repository, and then download those files into there.
 
+### Data for Gensim FastText Word Vectors
+
+https://s3-us-west-1.amazonaws.com/fasttext-vectors/wiki.en.zip
+
+Save to `wiki.en` folder
+
 ### Installation
 
 For production, certain packages are only needed.  They can be found in `requirements.txt`.
