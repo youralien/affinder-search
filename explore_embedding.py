@@ -66,9 +66,10 @@ def query_expansion(query):
     distances = cdist(phrase_embeddings, q_emb.reshape(1, -1), 'cosine').flatten()
     idxs = np.argsort(distances)
     idxs = idxs[:int(1.5 * np.log2(len(idxs)))]
-    final_kws = [kw_phrases[idx] for idx in idxs]
-    for e in final_kws:
-        print(" ".join(e))
+    final_kws = [(kw_phrases[idx], 1-distances[idx]) for idx in idxs]
+    print("final_kws:\n", final_kws)
+    # for kw, dist in final_kws:
+    #     print(" ".join(e))
 
     return final_kws
 

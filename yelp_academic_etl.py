@@ -58,8 +58,6 @@ def query_categories_by_many(words, X, categories, vocabulary, how='inner',
             print("Ignoring ", word)
             continue
     combo_df = merge_many_dfs(dfs, how)
-    combo_df["tfidf"] = combo_df.sum(axis=1)
-    combo_df = combo_df.sort_values("tfidf", ascending=False)
     return combo_df[:top_n]
 
 
@@ -69,7 +67,12 @@ def merge_many_dfs(dfs, how):
     for i in range(2, len(dfs)):
         chained_merge_cmd += ".merge(dfs[%d],how='%s',on='feature')" % (i, how)
 
-    return eval(chained_merge_cmd)
+    print(len(dfs))
+    print(chained_merge_cmd)
+    combo_df = eval(chained_merge_cmd)
+    combo_df["tfidf"] = combo_df.sum(axis=1)
+    combo_df = combo_df.sort_values("tfidf", ascending=False)
+    return combo_df
 
 
 def load_pickle(filename):
