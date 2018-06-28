@@ -2,7 +2,7 @@
 # @Author: youralien
 # @Date:   2018-02-20 02:05:38
 # @Last Modified by:   youralien
-# @Last Modified time: 2018-06-28 14:45:31
+# @Last Modified time: 2018-06-28 16:13:28
 
 from flask import Flask, jsonify
 
@@ -29,7 +29,8 @@ def retrieve_yelp_categories(query):
                                               top_n=25)
 
     categories = set(cats_tfidf["feature"].get_values())
-    categories.remove('')   # depreciated
+    if '' in categories:
+        categories.remove('')   # depreciated
     categories = list(categories)
     return jsonify(categories)
 
