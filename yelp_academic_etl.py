@@ -1,4 +1,5 @@
 import os
+import json
 import pickle
 import numpy as np
 import pandas as pd
@@ -88,4 +89,65 @@ def load_tfidf(fileprefix):
                     'tfidf/%s-X.mtx' % fileprefix))
     meta = np.load(os.path.join(os.path.dirname(__file__),
                    'tfidf/%s-meta.npz' % fileprefix))
+
     return X, meta['categories'], meta['vocabulary']
+
+
+def title2alias_dict(v3file='categories.json'):
+    """ Converts v2 titles to v3 aliases.
+    For example, kv["Shopping"] = 'shopping'
+
+    Parameters
+    ----------
+    v3file: path to v3 file
+    category_titles: list of category titles
+    """
+    v3_cats_json = json.load(open(v3file, 'r'))
+    kv = {cat['title']: cat['alias'] for cat in v3_cats_json}
+
+    # handcoded translation from v2 titles to v3 aliases
+    # FIXME: some of the aliases
+    depreciated_titles_aliases = {
+        '& Probates': 'willstrustsprobates',
+        'Beer': 'beer_and_wine',
+        'Books': 'media',
+        'Ethic Grocery': 'ethicgrocery',
+        'Mags': 'media',
+        'Music & Video': 'media',
+        'Pet Boarding/Pet Sitting': 'pet_sitting',  # petboarding too
+        'Psychics & Astrologers': 'astrologers',    # psychics too
+        'Trusts': 'willstrustsprobates',
+        'Used': 'vintage',
+        'Vintage & Consignment': 'vintage',
+        'Vinyl Siding': 'vinylsiding',
+        'Wills': 'willstrustsprobates',
+        'Wine & Spirits': 'beer_and_wine',
+        'Dry Cleaning & Laundry': 'laundromat',     # dryclean too
+    }
+
+    kv.update(depreciated_titles_aliases)
+
+    return kv
+
+
+def category_title2alias(categories):
+    """
+    Parameters
+    ----------
+    categories: list of strings
+        yelp category titles
+
+    Returns
+    -------
+    aliases: list of strings
+        yelp category aliases
+    """
+
+    title2alias = title2alias_dict()
+    aliases = []
+    for cat_title in categories:
+        try:
+            aliases.append(title2alias[cat_title])
+        except KeyError:
+            aliases.append('')
+    return aliases
